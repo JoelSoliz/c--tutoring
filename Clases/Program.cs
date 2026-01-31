@@ -31,20 +31,20 @@
 //person?.age != null ? person.age : 0;
 
 
-//void RegularIncrement(int x)
-//{
-//    x++;
-//}
+void RegularIncrement(int x)
+{
+    x++;
+}
 
-//void Increment(ref int x)
-//{
-//    x++;
-//}
+void Increment(ref int x)
+{
+    x++;
+}
 
-//int a = 5;
-//RegularIncrement(a);
-//Console.WriteLine(a);
+int a = 5;
+RegularIncrement(a);
+Console.WriteLine(a);
 
-//Increment(ref a);
-//Console.WriteLine(a);
+Increment(ref a);
+Console.WriteLine(a);
 
