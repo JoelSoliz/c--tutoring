@@ -1389,31 +1389,31 @@ namespace Clase2_CSharp_Ejemplos
 
     class Program
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("╔════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║     CLASE 2 - C# EJEMPLOS COMPLETOS                    ║");
-            Console.WriteLine("╚════════════════════════════════════════════════════════╝\n");
+        //static void Main(string[] args)
+        //{
+        //    Console.WriteLine("╔════════════════════════════════════════════════════════╗");
+        //    Console.WriteLine("║     CLASE 2 - C# EJEMPLOS COMPLETOS                    ║");
+        //    Console.WriteLine("╚════════════════════════════════════════════════════════╝\n");
 
-            // Descomentar la sección que quieras probar
+        //    // Descomentar la sección que quieras probar
 
-            // TestCollections();
-            // TestClassTypes();
-            // TestEncapsulation();
-            // TestInterfaces();
-            // TestPolymorphism();
-            TestSOLID();
+        //    // TestCollections();
+        //    // TestClassTypes();
+        //    // TestEncapsulation();
+        //    // TestInterfaces();
+        //    // TestPolymorphism();
+        //    TestSOLID();
 
 
-        var person = new Person()
-        {
-            Name = "Luciana",
-            Age = 23
-        };
-        Console.WriteLine("\n\nPresiona cualquier tecla para salir...");
-            Console.ReadKey();
+        //    var person = new Person()
+        //    {
+        //        Name = "Luciana",
+        //        Age = 23
+        //    };
+        //    Console.WriteLine("\n\nPresiona cualquier tecla para salir...");
+        //    Console.ReadKey();
 
-        }
+        //}
 
         static void TestCollections()
         {
