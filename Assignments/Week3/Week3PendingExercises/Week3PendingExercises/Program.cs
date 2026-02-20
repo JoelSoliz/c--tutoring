@@ -6,7 +6,11 @@
         HealthyMenu.CalculateStudents();
         */
 
-        LexicographicalAnalysis.AnalyzeBytes();
+        // LexicographicalAnalysis.AnalyzeBytes();
+
+        // EliminatingBalloons.findMinimumArrows();
+
+        Escalator.findLastTimeInEscalator();
 
 
     }

@@ -211,25 +211,103 @@ namespace Classes.Class3
 
     class Class3
     {
-        //static void Main(string[] args)
-        //{
+        static void Main(string[] args)
+        {
         //    Console.WriteLine("╔════════════════════════════════════════╗");
         //    Console.WriteLine("║  C# Tutoring - Clase 3: LINQ           ║");
         //    Console.WriteLine("║  Ejercicios Prácticos                  ║");
         //    Console.WriteLine("╚════════════════════════════════════════╝");
 
-        //    var genre = Console.ReadLine();
-        //    var songs = TestData.GetSongs();
-        //    var filteredSongs = songs.Where(song => song.Genre == genre && song.ReleaseDate.Year >= 2020)
-        //                            .OrderBy(song => song.ReleaseDate);
-        //                            //.Select(song => song.Title);
-        //    foreach (var song in filteredSongs)
-        //    {
-        //        Console.WriteLine(song.GetTitleInitials());
-        //    }
+            // var genre = Console.ReadLine();
+            var songs = TestData.GetSongs();
+            var playlists = TestData.GetPlaylists();
+            var movies = TestData.GetMovies();
+            var directors = TestData.GetDirectors();
+            /* Class Example
+            var filteredSongs = songs.Where(song => song.Genre == genre && song.ReleaseDate.Year >= 2020)
+                                    .OrderBy(song => song.ReleaseDate);
+                                    //.Select(song => song.Title);
+            foreach (var song in filteredSongs)
+            {
+                Console.WriteLine(song.GetTitleInitials());
+            }
+            */
 
-        //    Console.WriteLine("\n✅ Programa finalizado. Presiona cualquier tecla para salir.");
-        //    Console.ReadKey();
-        //}
+            // EXERCISE 1
+            /*
+            string artist = "Bad Bunny";
+            var filterBadBunnySongs = songs.Where(song => song.Artist == artist && song.DurationSeconds >= 150 &&
+                                        song.DurationSeconds <= 260)
+                                        .OrderByDescending(song => song.ReleaseDate)
+                                        .ThenBy(song => song.Title)
+                                        .Select(song => $"{song.Title} - {song.Artist} ({song.DurationSeconds / 60:D2}:{song.DurationSeconds % 60:D2})")
+                                        .ToList(); // materialization
+
+            foreach (var song in filterBadBunnySongs) // now is a string
+            {
+                Console.WriteLine(song);
+
+            }
+            */
+
+            // EXERCISE 2
+            /*
+            var allPlaylists = playlists.SelectMany(playlist => playlist.Songs)
+                   .Where(song => song != null) // SONG OBJECT
+                   .Select(song => song.Artist).Distinct()
+                   .OrderBy(song => song);
+
+
+            foreach (var song in allPlaylists) // now is a string
+            {
+                Console.WriteLine(song);
+
+            }
+            */
+
+            // EXERCISE 3
+            /*
+            var groupByGenre = songs.GroupBy(song => song.Genre)
+                .Select(group => new
+                { // anonymous object
+                    Genre = group.Key,
+                    Count = group.Count(),
+                    Average = group.Average(song => song.DurationSeconds),
+                    TopSongTitle = group.OrderByDescending(song => song.PlayCount)
+                    .First().Title
+                })
+                .ToList();
+
+            foreach (var genreStats in groupByGenre) // now is a string
+            {
+                Console.WriteLine($"Genres: {genreStats.Genre}, Songs: {genreStats.Count}, Average: {genreStats.Average:0.00}, Top Song: {genreStats.TopSongTitle}");
+
+            }
+            // Blocking operations: Specially GroupBy, because we're bringing the entire dataset
+            // For example if there are 1000 sons with 50 genres, it would take some time and block other operations
+            // Also, the count, average and order because we're iterating the whole data
+            */
+
+            //EXERCISE 4
+            /*
+            var joinRomanticMovies =
+                from movie in movies
+                join director in directors on movie.DirectorId equals director.Id
+                where movie.Genre == "romance"
+                select new { DirectorName = director.Name, MovieTitle = movie.Title, Rating = movie.Rating }; //anonymous object
+
+            foreach (var romanticMovies in joinRomanticMovies) // now is a string
+            {
+                Console.WriteLine($"Director: {romanticMovies.DirectorName}, Movie: {romanticMovies.MovieTitle}, Rating: {romanticMovies.Rating}");
+
+            }
+            */
+
+
+
+            Console.WriteLine("\n✅ Programa finalizado. Presiona cualquier tecla para salir.");
+            Console.ReadKey();
+
+        }
     }
 }
