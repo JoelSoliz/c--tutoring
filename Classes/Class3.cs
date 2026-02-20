@@ -193,6 +193,18 @@ namespace Classes.Class3
             return titleInitials.JoinString();
         }
 
+        // EXERCISE 8
+        public static string ToLabel(this Song song)
+        {
+            return $"{song.Title} - {song.Artist}";
+        }
+
+        public static IEnumerable<Song> TopByPlays(this IEnumerable<Song> song, int n)
+        {
+            var topSongs = song.OrderByDescending(s => s.PlayCount).Take(n);
+            return topSongs;
+        }
+
         public static string JoinString(this IEnumerable<string> data)
         {
             var sb = new StringBuilder();
@@ -211,6 +223,12 @@ namespace Classes.Class3
 
     class Class3
     {
+        static List<Song> FilterSongs(IEnumerable<Song> songs, Func<Song, bool> rule)
+        {
+            var result = songs.Where(song => rule(song)).ToList();
+            return result;
+        }
+
         static void Main(string[] args)
         {
         //    Console.WriteLine("╔════════════════════════════════════════╗");
@@ -223,8 +241,9 @@ namespace Classes.Class3
             var playlists = TestData.GetPlaylists();
             var movies = TestData.GetMovies();
             var directors = TestData.GetDirectors();
-            /* Class Example
-            var filteredSongs = songs.Where(song => song.Genre == genre && song.ReleaseDate.Year >= 2020)
+
+            #region Class Example
+            /* Class Example            var filteredSongs = songs.Where(song => song.Genre == genre && song.ReleaseDate.Year >= 2020)
                                     .OrderBy(song => song.ReleaseDate);
                                     //.Select(song => song.Title);
             foreach (var song in filteredSongs)
@@ -232,8 +251,9 @@ namespace Classes.Class3
                 Console.WriteLine(song.GetTitleInitials());
             }
             */
+            #endregion
 
-            // EXERCISE 1
+            #region Exercise1
             /*
             string artist = "Bad Bunny";
             var filterBadBunnySongs = songs.Where(song => song.Artist == artist && song.DurationSeconds >= 150 &&
@@ -249,8 +269,9 @@ namespace Classes.Class3
 
             }
             */
+            #endregion
 
-            // EXERCISE 2
+            #region Exercise2
             /*
             var allPlaylists = playlists.SelectMany(playlist => playlist.Songs)
                    .Where(song => song != null) // SONG OBJECT
@@ -264,8 +285,9 @@ namespace Classes.Class3
 
             }
             */
+            #endregion
 
-            // EXERCISE 3
+            #region Exercise3
             /*
             var groupByGenre = songs.GroupBy(song => song.Genre)
                 .Select(group => new
@@ -287,7 +309,9 @@ namespace Classes.Class3
             // For example if there are 1000 sons with 50 genres, it would take some time and block other operations
             // Also, the count, average and order because we're iterating the whole data
             */
+            #endregion
 
+            #region Exercise4
             //EXERCISE 4
             /*
             var joinRomanticMovies =
@@ -302,12 +326,96 @@ namespace Classes.Class3
 
             }
             */
+            #endregion
 
+            #region Exercise5
+            /*
+            // EXERCISE 5
+            // Here a group join is necessary, to count the romantic movies 
+            var allDirectors =
+                from director in directors
+                join movie in movies on director.Id equals movie.DirectorId into moviesGroup
+                select new
+                {
+                    Name = director.Name,
+                    RomanceMovieCount = moviesGroup.Where(movie => movie.Genre == "romance")
+                    .Count()
+                };
 
+            foreach (var director in allDirectors)
+            {
+                Console.WriteLine($"Director: {director.Name}, RomanticMovies: {director.RomanceMovieCount}");
+            }
+            */
+            #endregion
+
+            #region Exercise6
+            /*
+            var popularSongs = FilterSongs(songs, song => song.PlayCount > 1_000_000);
+            Console.WriteLine("POPULAR SONGS:");
+            foreach (var popularSong in popularSongs) 
+            {
+                Console.WriteLine(popularSong);
+            }
+
+            var taylorSongs = FilterSongs(songs, song => song.Artist == "Taylor Swift" && song.DurationSeconds < 210);
+            Console.WriteLine("TAYLOR SWIFT:");
+            foreach (var taylorSong in taylorSongs)
+            {
+                Console.WriteLine(taylorSong);
+            }
+            */
+
+            // We can test only the function and the rule, instead of testing into harcoded data or 
+            // method, the method never changes, only the rules
+            #endregion
+
+            #region Exercise7
+            /* debug
+            var thresholds = new[] { 100 _000, 1 _000_000, 10 _000_000 };
+            var predicates = new List<Func<Song, bool>>();
+
+            // Crea predicados en un loop
+            for (int i = 0; i < thresholds.Length; i++)
+            {
+                predicates.Add(s = > s.PlayCount >= thresholds[i]); // if the loop ends: i = 3
+            }
+
+            // Ejecuta cada predicado sobre una cancion
+            var testSong = new Song { PlayCount = 500 _000 };
+            foreach (var pred in predicates) // all predicates captured i variable no it's value
+            {
+                Console.WriteLine(pred(testSong));
+            } // error: index out of range 3 doesn't exists, the array is [0 1 2]
+            */
+
+            var thresholds = new[] { 100_000, 1_000_000, 10_000_000 };
+            var predicates = new List<Func<Song, bool>>();
+
+            // Crea predicados en un loop
+            for (int i = 0; i < thresholds.Length; i++)
+            {
+                var actualTreshold = thresholds[i];
+                predicates.Add(s => s.PlayCount >= actualTreshold);
+            }
+
+            var testSong = new Song { PlayCount = 500_000 };
+            foreach (var pred in predicates)
+            {
+                Console.WriteLine(pred(testSong));
+            }
+            #endregion
+
+            #region Exercise8
+            var topSongs = songs.TopByPlays(3);
+            foreach (var song in topSongs)
+            {
+                Console.WriteLine(song.ToLabel());
+            }
+            #endregion
 
             Console.WriteLine("\n✅ Programa finalizado. Presiona cualquier tecla para salir.");
             Console.ReadKey();
-
         }
     }
 }
