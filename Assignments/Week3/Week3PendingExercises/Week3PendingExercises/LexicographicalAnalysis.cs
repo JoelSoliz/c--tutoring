@@ -24,9 +24,6 @@ public class LexicographicalAnalysis
                     bitsQuantity[k]++;
                 }
             }
-
-
-
         }
 
         for (int i = 0; i < N; i++)
