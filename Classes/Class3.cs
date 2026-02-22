@@ -241,6 +241,7 @@ namespace Classes.Class3
             var playlists = TestData.GetPlaylists();
             var movies = TestData.GetMovies();
             var directors = TestData.GetDirectors();
+            var users = TestData.GetUsers();
 
             #region Class Example
             /* Class Example            var filteredSongs = songs.Where(song => song.Genre == genre && song.ReleaseDate.Year >= 2020)
@@ -407,10 +408,59 @@ namespace Classes.Class3
             #endregion
 
             #region Exercise8
+            /*
             var topSongs = songs.TopByPlays(3);
             foreach (var song in topSongs)
             {
                 Console.WriteLine(song.ToLabel());
+            }
+            */
+            #endregion
+            
+            #region Exercise9
+            /*
+            IQueryable<Song> dbSongs =
+                songs.AsQueryable();
+            string selectedArtist = Console.ReadLine();
+            // first version
+            var filterSongs = dbSongs.Where(s => s.Artist == selectedArtist).Take(20)
+                .Select(song => song.Title);
+
+            // second version
+            var filterOtherSongs = dbSongs.Where(song => song.Artist == selectedArtist)
+                    .Select(song => song.Title)
+                    .Take(20);
+
+            foreach (var song in filterOtherSongs)
+            { 
+                Console.WriteLine(song);
+            }
+
+            // Question 2
+            // Using C# methods that SQL doesn't recognize, such as custom methods.
+            // Incorrect operator order using Take before Where brings more data into SQL. (always filter first)
+            // Use external data or variables that manages app state.
+
+            // Question 3: The effect is that one part is gone to be executed in sql and other in memory.
+            */
+            #endregion
+            
+
+            #region Exercise10
+            var bossBattle = users.Where(user => user.Watched.Where(movie => movie.Genre == "romance").Count() >= 3)
+                .ToList() // in the case we're going to reuse this filter
+                .SelectMany(user => user.Watched) // directly movie object
+                .DistinctBy(movie => movie.Id)
+                .OrderByDescending(movie => movie.Rating)
+                .ThenBy(movie => movie.DurationMinutes)
+                .Take(5)
+                .Select(movie => movie.Title);
+
+            // other case to materialize: at the final if we're going to use a foreach only like 1 execution
+
+            foreach (var movie in bossBattle)
+            {
+                Console.WriteLine(movie);
             }
             #endregion
 
