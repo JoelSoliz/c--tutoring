@@ -211,25 +211,25 @@ namespace Classes.Class3
 
     class Class3
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("╔════════════════════════════════════════╗");
-            Console.WriteLine("║  C# Tutoring - Clase 3: LINQ           ║");
-            Console.WriteLine("║  Ejercicios Prácticos                  ║");
-            Console.WriteLine("╚════════════════════════════════════════╝");
+        //static void Main(string[] args)
+        //{
+        //    Console.WriteLine("╔════════════════════════════════════════╗");
+        //    Console.WriteLine("║  C# Tutoring - Clase 3: LINQ           ║");
+        //    Console.WriteLine("║  Ejercicios Prácticos                  ║");
+        //    Console.WriteLine("╚════════════════════════════════════════╝");
 
-            var genre = Console.ReadLine();
-            var songs = TestData.GetSongs();
-            var filteredSongs = songs.Where(song => song.Genre == genre && song.ReleaseDate.Year >= 2020)
-                                    .OrderBy(song => song.ReleaseDate);
-                                    //.Select(song => song.Title);
-            foreach (var song in filteredSongs)
-            {
-                Console.WriteLine(song.GetTitleInitials());
-            }
+        //    var genre = Console.ReadLine();
+        //    var songs = TestData.GetSongs();
+        //    var filteredSongs = songs.Where(song => song.Genre == genre && song.ReleaseDate.Year >= 2020)
+        //                            .OrderBy(song => song.ReleaseDate);
+        //                            //.Select(song => song.Title);
+        //    foreach (var song in filteredSongs)
+        //    {
+        //        Console.WriteLine(song.GetTitleInitials());
+        //    }
 
-            Console.WriteLine("\n✅ Programa finalizado. Presiona cualquier tecla para salir.");
-            Console.ReadKey();
-        }
+        //    Console.WriteLine("\n✅ Programa finalizado. Presiona cualquier tecla para salir.");
+        //    Console.ReadKey();
+        //}
     }
 }
