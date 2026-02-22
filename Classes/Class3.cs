@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Classes
+namespace Classes.Class3
 {
     public class Song
     {
@@ -209,7 +209,7 @@ namespace Classes
     // PROGRAMA PRINCIPAL
     // ============================================
 
-    class Program
+    class Class3
     {
         static void Main(string[] args)
         {
