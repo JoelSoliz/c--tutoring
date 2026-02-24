@@ -25,7 +25,6 @@ public class LexicographicalAnalysis
                 }
             }
         }
-
         for (int i = 0; i < N; i++)
         {
             for (int k = 29; k >= 0; k--)

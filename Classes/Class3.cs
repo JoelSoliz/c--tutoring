@@ -286,6 +286,19 @@ namespace Classes.Class3
 
             }
             */
+            // query syntax
+            var queryPlaylists =
+                (from playlist in playlists
+                 from song in playlist.Songs
+
+                 where song != null
+                 select song.Artist)
+                .Distinct().OrderBy(song => song)
+
+            foreach (var query in queryPlaylists)
+            {
+                Console.WriteLine(query);
+            }
             #endregion
 
             #region Exercise3
@@ -307,13 +320,13 @@ namespace Classes.Class3
 
             }
             // Blocking operations: Specially GroupBy, because we're bringing the entire dataset
-            // For example if there are 1000 sons with 50 genres, it would take some time and block other operations
+            // For example if there are 1000 songs with 50 genres, it would take some time and block other operations
             // Also, the count, average and order because we're iterating the whole data
             */
             #endregion
 
             #region Exercise4
-            //EXERCISE 4
+            //EXERCISE 4: Hacerlo con method syntax
             /*
             var joinRomanticMovies =
                 from movie in movies
@@ -327,11 +340,29 @@ namespace Classes.Class3
 
             }
             */
+
+            // method syntax solution
+            var methodSyntaxJoin = movies.Join(directors,
+                movie => movie.DirectorId,
+                director => director.Id,
+                (movie, director) => new
+                {
+                    DirectorName = director.Name,
+                    MovieTitle = movie.Title,
+                    Rating = movie.Rating
+                }
+                )
+                .Where(movie => movie.Genre == "romance");
+
+            foreach (var romanticMethod in methodSyntaxJoin)
+            {
+                Console.WriteLine($"Director: {romanticMethod.DirectorName}, Movie: {romanticMethod.MovieTitle}, Rating: {romanticMethod.Rating}");
+            }
             #endregion
 
             #region Exercise5
             /*
-            // EXERCISE 5
+            // EXERCISE 5: Filtrar peliculas primero
             // Here a group join is necessary, to count the romantic movies 
             var allDirectors =
                 from director in directors
@@ -348,6 +379,20 @@ namespace Classes.Class3
                 Console.WriteLine($"Director: {director.Name}, RomanticMovies: {director.RomanceMovieCount}");
             }
             */
+
+            // METHOD SYNTAX
+            var allDirectorsMethodSyntax =
+                directors.GroupJoin(movies, director => director.Id, movie => movie.DirectorId,
+                (director, moviesGroup) => new
+                {
+                    Name = director.Name,
+                    RomanceMovieCount = moviesGroup.Count(movie => movie.Genre == "romance")
+                });
+            foreach (var otherDirector in allDirectorsMethodSyntax)
+            {
+                Console.WriteLine($"Director: {otherDirector.Name}, RomanticMovies: {otherDirector.RomanceMovieCount}");
+
+            }
             #endregion
 
             #region Exercise6
@@ -396,8 +441,8 @@ namespace Classes.Class3
             // Crea predicados en un loop
             for (int i = 0; i < thresholds.Length; i++)
             {
-                var actualTreshold = thresholds[i];
-                predicates.Add(s => s.PlayCount >= actualTreshold);
+                var actualTreshold = i;
+                predicates.Add(s => s.PlayCount >= treshholds[actualTreshold]);
             }
 
             var testSong = new Song { PlayCount = 500_000 };
@@ -416,7 +461,7 @@ namespace Classes.Class3
             }
             */
             #endregion
-            
+
             #region Exercise9
             /*
             IQueryable<Song> dbSongs =
@@ -444,10 +489,9 @@ namespace Classes.Class3
             // Question 3: The effect is that one part is gone to be executed in sql and other in memory.
             */
             #endregion
-            
 
             #region Exercise10
-            var bossBattle = users.Where(user => user.Watched.Where(movie => movie.Genre == "romance").Count() >= 3)
+            var bossBattle = users.Where(user => user.Watched.Count(movie => movie.Genre == "romance") >= 3)
                 .ToList() // in the case we're going to reuse this filter
                 .SelectMany(user => user.Watched) // directly movie object
                 .DistinctBy(movie => movie.Id)
