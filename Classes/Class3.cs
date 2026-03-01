@@ -5,7 +5,13 @@ using System.Text;
 
 namespace Classes.Class3
 {
-    public class Song
+    public interface IMedia
+    {
+        int Id { get; }
+        string Title { get; }
+    }
+
+    public class Song : IMedia
     {
         public int Id { get; init; }
         public string Title { get; init; } = "";
@@ -14,6 +20,8 @@ namespace Classes.Class3
         public int DurationSeconds { get; init; }
         public int PlayCount { get; init; }
         public DateTime ReleaseDate { get; init; }
+
+        public decimal Rating { get; init; }
 
         public override string ToString()
         {
@@ -29,16 +37,16 @@ namespace Classes.Class3
         public string Owner { get; init; } = "";
     }
 
-    public class Character
+    public class Character : IMedia
     {
         public int Id { get; init; }
-        public string Name { get; init; } = "";
+        public string Title { get; init; } = "";
         public string Anime { get; init; } = "";
         public int PowerLevel { get; init; }
         public List<string> Tags { get; init; } = new();
     }
 
-    public class Movie
+    public class Movie : IMedia
     {
         public int Id { get; init; }
         public string Title { get; init; } = "";
@@ -120,14 +128,14 @@ namespace Classes.Class3
         {
             return new List<Character>
             {
-                new Character { Id = 1, Name = "Naruto Uzumaki", Anime = "Naruto", PowerLevel = 9500, Tags = new List<string> { "hero", "ninja", "hokage" } },
-                new Character { Id = 2, Name = "Sasuke Uchiha", Anime = "Naruto", PowerLevel = 9300, Tags = new List<string> { "rival", "ninja", "avenger" } },
-                new Character { Id = 3, Name = "Sakura Haruno", Anime = "Naruto", PowerLevel = 7800, Tags = new List<string> { "hero", "ninja", "medic" } },
-                new Character { Id = 4, Name = "Monkey D. Luffy", Anime = "One Piece", PowerLevel = 10500, Tags = new List<string> { "hero", "pirate", "captain" } },
-                new Character { Id = 5, Name = "Roronoa Zoro", Anime = "One Piece", PowerLevel = 9800, Tags = new List<string> { "hero", "pirate", "swordsman" } },
-                new Character { Id = 6, Name = "Goku", Anime = "Dragon Ball Z", PowerLevel = 15000, Tags = new List<string> { "hero", "saiyan", "god" } },
-                new Character { Id = 7, Name = "Vegeta", Anime = "Dragon Ball Z", PowerLevel = 14500, Tags = new List<string> { "rival", "saiyan", "prince" } },
-                new Character { Id = 8, Name = "Eren Yeager", Anime = "Attack on Titan", PowerLevel = 11000, Tags = new List<string> { "hero", "titan", "freedom" } },
+                new Character { Id = 1, Title = "Naruto Uzumaki", Anime = "Naruto", PowerLevel = 9500, Tags = new List<string> { "hero", "ninja", "hokage" } },
+                new Character { Id = 2, Title = "Sasuke Uchiha", Anime = "Naruto", PowerLevel = 9300, Tags = new List<string> { "rival", "ninja", "avenger" } },
+                new Character { Id = 3, Title = "Sakura Haruno", Anime = "Naruto", PowerLevel = 7800, Tags = new List<string> { "hero", "ninja", "medic" } },
+                new Character { Id = 4, Title = "Monkey D. Luffy", Anime = "One Piece", PowerLevel = 10500, Tags = new List<string> { "hero", "pirate", "captain" } },
+                new Character { Id = 5, Title = "Roronoa Zoro", Anime = "One Piece", PowerLevel = 9800, Tags = new List<string> { "hero", "pirate", "swordsman" } },
+                new Character { Id = 6, Title = "Goku", Anime = "Dragon Ball Z", PowerLevel = 15000, Tags = new List<string> { "hero", "saiyan", "god" } },
+                new Character { Id = 7, Title = "Vegeta", Anime = "Dragon Ball Z", PowerLevel = 14500, Tags = new List<string> { "rival", "saiyan", "prince" } },
+                new Character { Id = 8, Title = "Eren Yeager", Anime = "Attack on Titan", PowerLevel = 11000, Tags = new List<string> { "hero", "titan", "freedom" } },
             };
         }
 
