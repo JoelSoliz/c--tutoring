@@ -1,0 +1,60 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using MultiverseBistroAPI.DTOs;
+using MultiverseBistroAPI.Interfaces.Services;
+
+namespace MultiverseBistroAPI.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class RecipeController : Controller
+    {
+        private readonly IRecipeService _service;
+
+        public RecipeController(IRecipeService service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public IActionResult GetAll(int page = 1, int limit = 5)
+        {
+            var recipes = _service.GetRecipes(limit, page);
+            return Ok(recipes);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetById(Guid id)
+        {
+            try
+            {
+                var recipe = _service.GetRecipe(id);
+                return Ok(recipe);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Create(RecipeCreateDTO data)
+        {
+            var recipe = _service.CreateRecipe(data);
+            return Ok(recipe);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            try
+            {
+                var result = _service.DeleteRecipe(id);
+                return Ok();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+    }
+}
