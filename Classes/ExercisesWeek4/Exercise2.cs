@@ -1,9 +1,4 @@
 ﻿using Classes.Class3;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Classes.ExercisesWeek4
 {
@@ -31,10 +26,10 @@ namespace Classes.ExercisesWeek4
         private readonly List<Song> _songs = new List<Song>();
         private int _counter = 0;
         private readonly string _allowedGenre = "reggaeton";
-        string result = "Success";
 
         public void AddSongSafe(Song song)
         {
+            string result = "Success";
             try
             {
                 if (song.Genre != _allowedGenre)
@@ -42,28 +37,21 @@ namespace Classes.ExercisesWeek4
                     throw new InvalidGenreException(song.Genre);
                 }
 
-                var songExists = _songs.Any(s => s.Title == song.Title);
+                var songExists = _songs.Any(s => s.Equals(song));
                 if (songExists)
                 {
                     throw new DuplicateSongException(song.Title);
                 }
-
                 _songs.Add(song);
             }
-            catch (InvalidGenreException ex)
+            catch (PlaylistException ex) //playlist exception
             {
-                result = $"Error: {ex.Message}";
-            }
-            catch (DuplicateSongException ex)
-            {
-
                 result = $"Error: {ex.Message}";
             }
             finally
             {
                 _counter++;
                 Console.WriteLine($"Registered errors: {_counter} : {result}");
-
             }
         }
 
@@ -80,11 +68,10 @@ namespace Classes.ExercisesWeek4
             }
         }
     }
-
     /*
     public class Program
     {
-        public static void Main2(string[] args)
+        public static void Main(string[] args)
         {
             var songs = TestData.GetSongs();
             var badBunnyValidator = new BadBunnyValidator();

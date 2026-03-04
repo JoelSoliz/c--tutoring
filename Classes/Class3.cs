@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace Classes.Class3
 {
@@ -20,12 +17,25 @@ namespace Classes.Class3
         public int DurationSeconds { get; init; }
         public int PlayCount { get; init; }
         public DateTime ReleaseDate { get; init; }
-
         public decimal Rating { get; init; }
+        public decimal Ranking => PlayCount * 0.6m + Rating * 0.4m;
 
         public override string ToString()
         {
             return $"{Title} - {Artist} ({ReleaseDate:dd-MM-yyyy})";
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Song))
+                return false;
+            else
+                return this.Title == ((Song)obj).Title;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Title.GetHashCode();
         }
     }
 

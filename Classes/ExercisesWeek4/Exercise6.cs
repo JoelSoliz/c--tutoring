@@ -10,6 +10,7 @@
         public ApiException(int statusCode, string message) : base(message) { StatusCode = statusCode; }
     }
 
+    // quitar message (revisar en validation exception), vale la pena poner message en validation exception
     public class DatabaseException : ApiException
     {
         public DatabaseException(string message, Exception inner) : base(500, "We couldn't process your request. Please try again", inner) { }
@@ -22,7 +23,7 @@
 
     public class ValidationException : ApiException
     {
-        public ValidationException(string message) : base(400, "Bad request. Please try a valid operation") { }
+        public ValidationException(string message) : base(400, message) { }
     }
 
     public class ApiResponse
@@ -60,16 +61,24 @@
             catch (Exception unexpectedException)
             {
                 Console.WriteLine($"Unexcpected Exception: {unexpectedException.InnerException}");
+                string errorChain = "";
+                Exception? current = unexpectedException;
+                while (current != null)
+                {
+                    errorChain += current.Message;
+                    current = current.InnerException;
+                }
                 var response = new ApiResponse
                 {
                     StatusCode = 500,
-                    Message = $"Unexcpected Exception: {unexpectedException.InnerException}",
+                    Message = errorChain,
                     TraceId = Guid.NewGuid().ToString()
                 };
                 return response;
             }
         }
     }
+
     /*
     public class Program
     {
@@ -84,13 +93,6 @@
                                throw databaseException;
                            });
             Console.WriteLine($"StatusCode: {response.StatusCode}, Message: {response.Message}, TraceId: {response.TraceId}");
-
-            Exception? currentException = databaseException; //it can be null
-            while (currentException != null)
-            {
-                Console.WriteLine($"{currentException.Message}");
-                currentException = currentException.InnerException; //iterate until null
-            }
         }
     }
     */

@@ -1,17 +1,11 @@
 ﻿using Classes.Class3;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Classes.ExercisesWeek4
 {
-    public class TaylorStreaming
+    public class Streaming
     {
-        private readonly List<Song> _songs = new List<Song>();
         public int progress = 0;
+        public int progressDivision = 3;
 
         public async Task BufferSongAsync(Song song, CancellationToken cancellationToken)
         {
@@ -20,21 +14,19 @@ namespace Classes.ExercisesWeek4
                 cancellationToken.ThrowIfCancellationRequested();
                 await Task.Delay(200, cancellationToken);
 
-                progress = i * 100 / 3;
-                Console.WriteLine($"Buffering: {song.Title}....{progress}");
+                progress = i * 100 / progressDivision;
+                Console.WriteLine($"Buffering: {song.Title}....{progress}%");
             }
         }
     }
 
-    /*
-    public class Program
+    /*public class Program
     {
         public static async Task Main(string[] args)
         {
-
             var cts = new CancellationTokenSource(300);
             var token = cts.Token;
-            var taylorStreaming = new TaylorStreaming();
+            var taylorStreaming = new Streaming();
             Stopwatch stopwatch = new Stopwatch();
             var songs = TestData.GetSongs();
             var taylorSongs = songs.Where(song => song.Artist == "Taylor Swift").ToList();
@@ -44,12 +36,11 @@ namespace Classes.ExercisesWeek4
             var task2 = taylorStreaming.BufferSongAsync(taylorSongs[1], token);
             var task3 = taylorStreaming.BufferSongAsync(taylorSongs[2], token);
             var task4 = taylorStreaming.BufferSongAsync(taylorSongs[3], token);
-            var tasks = new[] { task1, task2, task3, task4 };
+            var tasks = new List<Task> { task1, task2, task3, task4 };
             int counter = 0;
 
             try
             {
-
                 await Task.WhenAll(tasks);
                 stopwatch.Stop();
             }

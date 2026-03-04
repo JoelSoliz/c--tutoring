@@ -48,18 +48,24 @@ namespace Classes.ExercisesWeek4
             return new List<Song>(); // if all are empty
         }
 
+        public async Task<List<Song>> DelayProcess(int time)
+        {
+            await Task.Delay(time);
+            return new List<Song>();
+        }
         public async Task<List<Song>> GetFastestProcessTimeout()
         {
-            var delay = Task.Delay(600);
+            var delay = DelayProcess(600);
             List<Task<List<Song>>> tasks = new List<Task<List<Song>>> {
                 GetFromDatabaseAsync(),
                 GetFromCacheAsync(),
                 GetFromApiAsync(),
+                delay
             };
 
             while (tasks.Count > 0)
             {
-                var fastestProcess = await Task.WhenAny(tasks.Cast<Task>().Append(delay));
+                var fastestProcess = await Task.WhenAny(tasks);
                 if (fastestProcess == delay)
                 {
                     throw new TimeoutException();

@@ -10,7 +10,7 @@ namespace Classes.ExercisesWeek4
         // Ideal for: Main flow to be executed (such as treat a critical task)
         public List<Song> CalculateRankingSync(List<Song> songs)
         {
-            var calculation = songs.OrderByDescending(song => song.PlayCount * 0.6m + song.Rating * 0.4m)
+            var calculation = songs.OrderByDescending(song => song.Ranking)
                 .Take(10);
             return calculation.ToList();
         }
@@ -24,7 +24,7 @@ namespace Classes.ExercisesWeek4
         {
             var calculation = await Task.Run(() =>
             {
-                var formula = songs.OrderByDescending(song => song.PlayCount * 0.6m + song.Rating * 0.4m)
+                var formula = songs.OrderByDescending(song => song.Ranking)
                 .Take(10);
                 return formula.ToList();
             });
@@ -36,20 +36,17 @@ namespace Classes.ExercisesWeek4
         // So we have overhead herem coordeinating cores and chunks is a lot for that 
         // king of light calcuation. Here this parallel implementation can be used when
         // we need to do heave calcuations such as ai processing, audio compression in paralle
-
         public List<Song> CalculateRankingParallel(List<Song> songs)
         {
             ConcurrentBag<Song> bag = new ConcurrentBag<Song>();
             var parallel = Parallel.ForEach(songs, song =>
             {
-                bag.Add(song);
+                if (song.Ranking > 5000)
+                {
+                    bag.Add(song);
+                }
             });
-
-            var formula = bag.OrderByDescending(song => song.PlayCount * 0.6m + song.Rating * 0.4m)
-                .Take(10);
-
-            return formula.ToList();
-
+            return bag.OrderByDescending(song => song.Ranking).Take(10).ToList();
         }
     }
 
@@ -61,7 +58,9 @@ namespace Classes.ExercisesWeek4
             Random random = new Random();
             var ranking = new RankingProcessor();
             List<Song> songs = new List<Song>();
-
+            int totalSync = 0;
+            int totalAsync = 0;
+            int totalParallel = 0;
             for (int i = 1; i <= 500_000; i++)
             {
                 int id = random.Next(1, i);
@@ -72,23 +71,31 @@ namespace Classes.ExercisesWeek4
                 songs.Add(new Song { Id = id, Title = title, PlayCount = playCount, Rating = rating });
             }
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            ranking.CalculateRankingSync(songs);
-            stopwatch.Stop();
-            Console.WriteLine($"Sync time: {stopwatch.ElapsedMilliseconds}ms");
+            for (int i = 0; i < 10; i++)
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                ranking.CalculateRankingSync(songs);
+                stopwatch.Stop();
+                Console.WriteLine($"Sync time: {stopwatch.ElapsedMilliseconds}ms");
+                totalSync += (int)stopwatch.ElapsedMilliseconds;
 
-            stopwatch.Restart();
-            await ranking.CalculateRankingAsync(songs);
-            stopwatch.Stop();
-            Console.WriteLine($"Async time: {stopwatch.ElapsedMilliseconds}ms");
+                stopwatch.Restart();
+                await ranking.CalculateRankingAsync(songs);
+                stopwatch.Stop();
+                Console.WriteLine($"Async time: {stopwatch.ElapsedMilliseconds}ms");
+                totalAsync += (int)stopwatch.ElapsedMilliseconds;
 
-            stopwatch.Restart();
-            ranking.CalculateRankingParallel(songs);
-            stopwatch.Stop();
-            Console.WriteLine($"Parallel time: {stopwatch.ElapsedMilliseconds}ms");
+                stopwatch.Restart();
+                ranking.CalculateRankingParallel(songs);
+                stopwatch.Stop();
+                Console.WriteLine($"Parallel time: {stopwatch.ElapsedMilliseconds}ms");
+                totalParallel += (int)stopwatch.ElapsedMilliseconds;
+            }
+            Console.WriteLine($"Sync Average:{totalAsync / 10}");
+            Console.WriteLine($"Async Average:{totalSync / 10}");
+            Console.WriteLine($"Parallel Average:{totalParallel / 10}");
         }
     }
     */
 }
-

@@ -2,44 +2,26 @@
 {
     public class JewerlyCase
     {
-        public bool IsOrdered(int[][] jewerlyBoxes)
+        public bool IsRotation(int[][] matrix, int N, bool rowsAscending, bool colsAscending)
         {
-            for (int i = 0; i < jewerlyBoxes.Length - 1; i++)
+            for (int i = 0; i < N; i++)
             {
-                for (int j = 0; j < jewerlyBoxes.Length - 1; j++)
+                for (int j = 0; j < N - 1; j++)
                 {
-                    if (jewerlyBoxes[i][j] > jewerlyBoxes[i][j + 1]) //rows
-                    {
+                    if (rowsAscending ? matrix[i][j] > matrix[i][j + 1] : matrix[i][j] < matrix[i][j + 1])
                         return false;
-                    }
-                    if (jewerlyBoxes[i][j] > jewerlyBoxes[i + 1][j]) //columns
-                    {
+                }
+            }
+
+            for (int i = 0; i < N - 1; i++)
+            {
+                for (int j = 0; j < N; j++)
+                {
+                    if (colsAscending ? matrix[i][j] > matrix[i + 1][j] : matrix[i][j] < matrix[i + 1][j])
                         return false;
-                    }
                 }
             }
             return true;
-        }
-
-        public int[][] RotateClockwise(int[][] jewerlyBoxes, int N)
-        {
-            int[][] result = new int[N][];
-            // prepares empty matrix
-            for (int i = 0; i < jewerlyBoxes.Length; i++)
-            {
-                result[i] = new int[N];
-            }
-
-            //fills all the values
-            for (int i = 0; i < jewerlyBoxes.Length; i++)
-            {
-                for (int j = 0; j < jewerlyBoxes.Length; j++)
-                {
-                    result[N - 1 - j][i] = jewerlyBoxes[i][j]; //it represents the rotation: [0][0] [3-1-0][0] = [2][0]
-                    // j = row, i = column 
-                }
-            }
-            return result;
         }
     }
 
@@ -61,15 +43,10 @@
             }
 
             var current = jewerlyCase;
-            for (int i = 0; i <= 3; i++)
-            {
-                if (jewerly.IsOrdered(current))
-                {
-                    Console.WriteLine(i);
-                    break;
-                }
-                current = jewerly.RotateClockwise(current, N);
-            }
+            if (jewerly.IsRotation(jewerlyCase, N, true, true)) Console.WriteLine(0);
+            else if (jewerly.IsRotation(jewerlyCase, N, false, true)) Console.WriteLine(1);
+            else if (jewerly.IsRotation(jewerlyCase, N, false, false)) Console.WriteLine(2);
+            else Console.WriteLine(3);
         }
     }
 }

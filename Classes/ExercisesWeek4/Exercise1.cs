@@ -1,9 +1,4 @@
 ﻿using Classes.Class3;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Classes.ExercisesWeek4
 {
@@ -43,7 +38,7 @@ namespace Classes.ExercisesWeek4
             var fileToRemove = _files.Remove(fileToDelete);
         }
 
-        public static List<T> Merge<T>(List<T> a, List<T> b) where T : IMedia // it introduces it's own T
+        public static List<T> Merge(List<T> a, List<T> b)
         {
             var combinatedLists = a.Concat(b).DistinctBy(file => file.Id);
             return combinatedLists.ToList();

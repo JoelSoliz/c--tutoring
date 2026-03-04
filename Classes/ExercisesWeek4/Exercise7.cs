@@ -1,4 +1,6 @@
-﻿namespace Classes.ExercisesWeek4
+﻿using System.Runtime.ExceptionServices;
+
+namespace Classes.ExercisesWeek4
 {
     public class User
     {
@@ -65,7 +67,7 @@
         public async Task<Transaction> ProcessPaymentAsyncDelay(User user, decimal amount)
         {
             int delayTime = 100;
-            TimeoutException? lastException = null;
+            ExceptionDispatchInfo? lastException = null;
             for (int i = 0; i < 3; i++)
             {
                 try
@@ -79,13 +81,14 @@
                 }
                 catch (TimeoutException exception)
                 {
-                    lastException = exception;
+                    lastException = ExceptionDispatchInfo.Capture(exception);
                     Console.WriteLine(exception.Message);
                     await Task.Delay(delayTime);
                     delayTime *= 2; //100 200 400
                 }
             }
-            throw lastException!; //i swear it's not null
+            lastException!.Throw();
+            return null!; // never reached, but compiler needs it
         }
     }
 
