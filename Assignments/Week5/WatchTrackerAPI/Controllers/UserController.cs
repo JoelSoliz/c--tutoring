@@ -18,7 +18,7 @@ namespace WatchTrackerAPI.Controllers
         public IActionResult CreateUser(CreateUserRequest newUser)
         {
             var user = _userService.CreateUser(newUser);
-            return CreatedAtAction("GetUser", new { id = user.Id }, newUser);
+            return CreatedAtAction("GetUser", new { userId = user.Id }, user);
         }
 
         [HttpGet("{userId}")]

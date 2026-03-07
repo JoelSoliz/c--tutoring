@@ -21,6 +21,7 @@ namespace WatchTrackerAPI.Controllers
             var media = _mediaService.GetAllMedia(page, pageSize, type);
             return Ok(media);
         }
+
         [HttpGet("{id}")]
         public IActionResult GetMedia(Guid id)
         {
@@ -34,6 +35,7 @@ namespace WatchTrackerAPI.Controllers
                 return NotFound(exception.Message);
             }
         }
+
         [HttpPost]
         public IActionResult CreateMedia(CreateMediaRequest mediaToCreate)
         {
