@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using MultiverseBistroAPI.Data;
 using MultiverseBistroAPI.Interfaces;
 using MultiverseBistroAPI.Interfaces.Services;
@@ -11,8 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDBContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 builder.Services.AddScoped<IRecipeService, RecipeService>();
-builder.Services.AddSingleton<AppDBContext>();
 
 var app = builder.Build();
 
@@ -26,6 +29,12 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
+    RequestPath = new PathString("/uploads")
+});
 
 app.MapControllers();
 

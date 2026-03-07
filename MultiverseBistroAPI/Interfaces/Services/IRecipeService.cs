@@ -8,5 +8,6 @@ namespace MultiverseBistroAPI.Interfaces.Services
         public RecipeResponseDTO GetRecipe(Guid ID);
         public RecipeResponseDTO CreateRecipe(RecipeCreateDTO recipeCreateDTO);
         public bool DeleteRecipe(Guid ID);
+        public RecipeResponseDTO UploadImage(Guid ID, IFormFile file);
     }
 }

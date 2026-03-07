@@ -56,5 +56,19 @@ namespace MultiverseBistroAPI.Controllers
                 return NotFound(ex.Message);
             }
         }
+
+        [HttpPost("{id}/image")]
+        public IActionResult UploadImage(Guid id, IFormFile file)
+        {
+            try
+            {
+                var result = _service.UploadImage(id, file);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

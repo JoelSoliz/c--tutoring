@@ -10,9 +10,16 @@ namespace MultiverseBistroAPI.DTOs
         public string Category { get; set; } = "misc";
 
         [Required]
-        public List<string> Ingredients { get; set; }
+        public List<IngredientCreateDTO> Ingredients { get; set; }
 
         [Required]
         public string Instructions { get; set; }
+    }
+
+    public class IngredientCreateDTO
+    {
+        public string Name { get; set; }
+        public string Unit { get; set; }
+        public double Quantity { get; set; }
     }
 }

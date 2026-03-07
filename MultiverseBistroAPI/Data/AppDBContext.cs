@@ -1,24 +1,34 @@
-﻿using MultiverseBistroAPI.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using MultiverseBistroAPI.Models;
 
 namespace MultiverseBistroAPI.Data
 {
-    public class AppDBContext
+    public class AppDBContext : DbContext
     {
-        public AppDBContext()
+        public AppDBContext(DbContextOptions<AppDBContext> options) : base(options)
         {
-            Recipes = new List<Recipe> {
-                new Recipe()
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Sopa de Mani",
-                    Category = "sopa",
-                    Ingredients = new List<string> { "mani", "carne res", "papa", "fideo", "verduras varias"},
-                    Instructions = "Picar verduras y papa, picar carne, hervir el mani por 2 horas, hervir la carne, poner verduras en la carne, tostar fideo, poner el fideo en la carne, poner el mani, dejar cocer y listo.",
-                    CreatedAt = new DateTime(2026, 3, 1, 10, 50, 00)
-                }
-            };
         }
 
-        public List<Recipe> Recipes;
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<RecipeIngredient>()
+                .HasKey(recipeIngredient => new { recipeIngredient.RecipeId, recipeIngredient.IngredientId });
+
+            modelBuilder.Entity<RecipeIngredient>()
+                .HasOne(recipeIngredient => recipeIngredient.Recipe)
+                .WithMany(recipe => recipe.RecipeIngredients)
+                .HasForeignKey(recipeIngredient => recipeIngredient.RecipeId);
+
+            modelBuilder.Entity<RecipeIngredient>()
+                .HasOne(recipeIngredient => recipeIngredient.Ingredient)
+                .WithMany(ingredient => ingredient.RecipeIngredients)
+                .HasForeignKey(recipeIngredient => recipeIngredient.IngredientId);
+        }
+
+        public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<Ingredient> Ingredients { get; set; }
+        public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
     }
 }
