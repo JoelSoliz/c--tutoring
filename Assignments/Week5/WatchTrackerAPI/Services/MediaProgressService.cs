@@ -9,23 +9,27 @@ namespace WatchTrackerAPI.Services
     public class MediaProgressService : IMediaProgressService
     {
         private readonly AppDBContext _dbContext;
+        private readonly IMediaService _mediaService;
+        private readonly IUserService _userService;
 
-        public MediaProgressService(AppDBContext dbContext)
+        public MediaProgressService(AppDBContext dbContext, IMediaService mediaService, IUserService userService)
         {
             _dbContext = dbContext;
+            _mediaService = mediaService;
+            _userService = userService;
         }
 
         public MediaProgressResponse CreateOrUpdateProgress(CreateOrUpdateProgressRequest request, Guid userId)
         {
             var mediaId = request.MediaId;
-            ValidateUser(userId);
-            var media = ValidateMedia(mediaId);
-            var isExisting = GetMediaProgress(userId, mediaId);
+            _userService.GetUser(userId);
+            var media = _mediaService.GetMedia(mediaId);
+            var exists = GetMediaProgress(userId, mediaId);
             UserMediaProgress progress;
 
             ValidatePersonalRating(request.PersonalRating, request.EpisodesWatched, request.WatchStatus);
             ValidateRatingValue(request.PersonalRating);
-            if (isExisting == null) //if it doesn't exists
+            if (exists == null) //if it doesn't exists
             {
                 var newMedia = new UserMediaProgress
                 {
@@ -46,19 +50,19 @@ namespace WatchTrackerAPI.Services
             }
             else //if it exists: update it
             {
-                isExisting.EpisodesWatched = request.EpisodesWatched;
-                isExisting.Status = request.WatchStatus;
-                isExisting.PersonalRating = request.PersonalRating;
-                isExisting.LastUpdatedAt = DateTime.UtcNow;
+                exists.EpisodesWatched = request.EpisodesWatched;
+                exists.Status = request.WatchStatus;
+                exists.PersonalRating = request.PersonalRating;
+                exists.LastUpdatedAt = DateTime.UtcNow;
                 if (request.WatchStatus == WatchStatus.Completed)
                 {
-                    isExisting.FinishedAt = DateTime.UtcNow;
+                    exists.FinishedAt = DateTime.UtcNow;
                 }
-                if (isExisting.StartedAt == null)
+                if (exists.StartedAt == null)
                 {
-                    isExisting.StartedAt = DateTime.UtcNow;
+                    exists.StartedAt = DateTime.UtcNow;
                 }
-                progress = isExisting;
+                progress = exists;
             }
 
             return new MediaProgressResponse
@@ -79,8 +83,8 @@ namespace WatchTrackerAPI.Services
 
         public MediaProgressResponse UpdatePersonalRating(UpdatePersonalRatingRequest request, Guid userId, Guid mediaId)
         {
-            ValidateUser(userId);
-            var media = ValidateMedia(mediaId);
+            _userService.GetUser(userId);
+            var media = _mediaService.GetMedia(mediaId);
             var mediaProgress = GetMediaProgress(userId, mediaId);
 
             if (mediaProgress == null)
@@ -125,7 +129,7 @@ namespace WatchTrackerAPI.Services
 
             var items = allMediaProgress.Select(mediaProgess =>
             {
-                var media = ValidateMedia(mediaProgess.MediaId);
+                var media = _mediaService.GetMedia(mediaProgess.MediaId);
 
                 return new MediaProgressResponse
                 {
@@ -152,26 +156,6 @@ namespace WatchTrackerAPI.Services
                 TotalCount = totalCount,
             };
             return paginatedResponse;
-        }
-
-        private User ValidateUser(Guid userId)
-        {
-            var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
-            if (user == null)
-            {
-                throw new InvalidOperationException("The User doesn't exists");
-            }
-            return user;
-        }
-
-        private Media ValidateMedia(Guid mediaId)
-        {
-            var media = _dbContext.MediaContent.FirstOrDefault(m => m.Id == mediaId);
-            if (media == null)
-            {
-                throw new InvalidOperationException("The Media doesn't exists");
-            }
-            return media;
         }
 
         private UserMediaProgress? GetMediaProgress(Guid userId, Guid mediaId)
