@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WatchTrackerAPI.DTOs;
 using WatchTrackerAPI.Interfaces;
-using WatchTrackerAPI.Models.Enums;
 
 namespace WatchTrackerAPI.Controllers
 {
@@ -16,18 +15,18 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllMedia([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] MediaTypes? type = null)
+        public async Task<IActionResult> GetAllMedia([FromQuery] MediaQueryParams mediaParams)
         {
-            var media = _mediaService.GetAllMedia(page, pageSize, type);
+            var media = await _mediaService.GetAllMedia(mediaParams);
             return Ok(media);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetMedia(Guid id)
+        public async Task<IActionResult> GetMedia(Guid id)
         {
             try
             {
-                var media = _mediaService.GetMedia(id);
+                var media = await _mediaService.GetMedia(id);
                 return Ok(media);
             }
             catch (InvalidOperationException exception)
@@ -37,12 +36,26 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateMedia(CreateMediaRequest mediaToCreate)
+        public async Task<IActionResult> CreateMedia(CreateMediaRequest mediaToCreate)
         {
             try
             {
-                var media = _mediaService.CreateMedia(mediaToCreate);
+                var media = await _mediaService.CreateMedia(mediaToCreate);
                 return CreatedAtAction("GetMedia", new { id = media.Id }, media);
+            }
+            catch (InvalidOperationException exception)
+            {
+                return BadRequest(exception.Message);
+            }
+        }
+
+        [HttpDelete("{mediaId}")]
+        public async Task<IActionResult> DeleteMedia(Guid mediaId)
+        {
+            try
+            {
+                await _mediaService.DeleteMedia(mediaId);
+                return NoContent();
             }
             catch (InvalidOperationException exception)
             {

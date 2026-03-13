@@ -1,30 +1,31 @@
-﻿using WatchTrackerAPI.Models.Entities;
-using WatchTrackerAPI.Models.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using WatchTrackerAPI.Models.Entities;
 
 namespace WatchTrackerAPI.Data
 {
-    public class AppDBContext
+    public class AppDBContext : DbContext
     {
-        public AppDBContext()
-        {
-            MediaContent = new List<Media> {
-                new Media ()
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Bridgerton",
-                    Type = MediaTypes.TVShow,
-                    TotalEpisodes = 32,
-                    ReleaseDate = new DateTime(2026,2,26, 15,50,00),
-                    Genre = "Romantic Regency"
-                }
-            };
+        public AppDBContext(DbContextOptions<AppDBContext> options) : base(options) { }
 
-            Users = new List<User> { };
-            MediaProgresses = new List<UserMediaProgress> { };
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<UserMediaProgress>()
+                .HasKey(mediaProgress => new { mediaProgress.UserId, mediaProgress.MediaId });
+
+            modelBuilder.Entity<UserMediaProgress>()
+                 .HasOne(mediaProgress => mediaProgress.User)
+                 .WithMany(progress => progress.Progresses)
+                 .HasForeignKey(mediaProgress => mediaProgress.UserId);
+
+            modelBuilder.Entity<UserMediaProgress>()
+                .HasOne(mediaProgress => mediaProgress.Media)
+                .WithMany(progress => progress.UserProgress)
+                .HasForeignKey(mediaProgress => mediaProgress.MediaId);
         }
 
-        public List<Media> MediaContent;
-        public List<User> Users;
-        public List<UserMediaProgress> MediaProgresses;
+        public DbSet<Media> MediaContent { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserMediaProgress> MediaProgresses { get; set; }
     }
 }

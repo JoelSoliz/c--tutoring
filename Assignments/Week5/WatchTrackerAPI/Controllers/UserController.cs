@@ -15,19 +15,40 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateUser(CreateUserRequest newUser)
+        public async Task<IActionResult> CreateUser(CreateUserRequest newUser)
         {
-            var user = _userService.CreateUser(newUser);
+            var user = await _userService.CreateUser(newUser);
             return CreatedAtAction("GetUser", new { userId = user.Id }, user);
         }
 
         [HttpGet("{userId}")]
-        public IActionResult GetUser(Guid userId)
+        public async Task<IActionResult> GetUser(Guid userId)
         {
             try
             {
-                var media = _userService.GetUser(userId);
+                var media = await _userService.GetUser(userId);
                 return Ok(media);
+            }
+            catch (InvalidOperationException exception)
+            {
+                return NotFound(exception.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _userService.GetAllUsers();
+            return Ok(users);
+        }
+
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> DeleteUser(Guid userId)
+        {
+            try
+            {
+                await _userService.DeleteUser(userId);
+                return NoContent();
             }
             catch (InvalidOperationException exception)
             {

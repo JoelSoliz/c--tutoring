@@ -2,6 +2,8 @@
 {
     public static void Main(string[] args)
     {
+        #region Jigsaw of Shadows
+        /*
         string[] flatlandersInfo = Console.ReadLine().Split(' ');
 
         int degree = int.Parse(flatlandersInfo[0]);
@@ -40,5 +42,45 @@
         }
         totalLength += currentEnd - currentStart; // the pending interval
         Console.WriteLine(totalLength.ToString("F5")); //5 decimals
+        */
+        #endregion
+
+        #region Collatz Polynomial
+        string degree = Console.ReadLine();
+        int N = int.Parse(degree);
+        string[] polinomial = Console.ReadLine().Split(' ');
+        int polinom = 0;
+
+        //build the binary
+        foreach (string coef in polinomial)
+        {
+            polinom = (polinom << 1) | int.Parse(coef); //using left shift for convert to bytes and adds new bit to right
+        }
+
+        int steps = 0;
+        while (polinom != 1)
+        {
+            if (polinom % 2 == 1) //verifies last bit is 1
+            {
+                polinom = polinom ^ (polinom << 1) ^ 1;
+                // p * x = p << 1
+                //  ^ polinom adds the original pxx + p = p(x+1)
+                //coef = 0 or 1
+                // ^ 1 adds 1
+                // We can quit the 2 result if we sum 1 
+                // 1 0 0 1
+                // 1 0 0 1 0
+                // XOR = 1 1 0 1 1
+                // XOR 1 = 11010
+            }
+            else // if it's 0
+            {
+                polinom = polinom >> 1; // divide by x
+            }
+            steps++;
+        }
+
+        Console.WriteLine(steps);
+        #endregion
     }
 }
