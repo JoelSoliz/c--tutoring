@@ -1,11 +1,11 @@
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using WatchTrackerAPI.Data;
 using WatchTrackerAPI.Interfaces;
 using WatchTrackerAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -15,10 +15,15 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<AppDBContext>(options => options.UseMySql(
+    connectionString,
+    ServerVersion.AutoDetect(connectionString)
+    ));
+
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMediaProgressService, MediaProgressService>();
-builder.Services.AddSingleton<AppDBContext>();
+builder.Services.AddScoped<IUserStatsService, UserStatsService>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
