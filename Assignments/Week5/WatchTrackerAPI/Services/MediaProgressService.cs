@@ -1,4 +1,5 @@
-﻿using WatchTrackerAPI.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WatchTrackerAPI.Data;
 using WatchTrackerAPI.DTOs;
 using WatchTrackerAPI.Interfaces;
 using WatchTrackerAPI.Models.Entities;
@@ -19,12 +20,12 @@ namespace WatchTrackerAPI.Services
             _userService = userService;
         }
 
-        public MediaProgressResponse CreateOrUpdateProgress(CreateOrUpdateProgressRequest request, Guid userId)
+        public async Task<MediaProgressResponse> CreateOrUpdateProgress(CreateOrUpdateProgressRequest request, Guid userId)
         {
             var mediaId = request.MediaId;
-            _userService.GetUser(userId);
-            var media = _mediaService.GetMedia(mediaId);
-            var exists = GetMediaProgress(userId, mediaId);
+            await _userService.GetUser(userId);
+            var media = await _mediaService.GetMedia(mediaId);
+            var exists = await GetMediaProgress(userId, mediaId);
             UserMediaProgress progress;
 
             ValidatePersonalRating(request.PersonalRating, request.EpisodesWatched, request.WatchStatus);
@@ -40,6 +41,8 @@ namespace WatchTrackerAPI.Services
                     PersonalRating = request.PersonalRating,
                 };
                 _dbContext.MediaProgresses.Add(newMedia);
+                await _dbContext.SaveChangesAsync();
+
                 newMedia.LastUpdatedAt = DateTime.UtcNow;
                 newMedia.StartedAt = DateTime.UtcNow;
                 if (request.WatchStatus == WatchStatus.Completed)
@@ -81,11 +84,11 @@ namespace WatchTrackerAPI.Services
             };
         }
 
-        public MediaProgressResponse UpdatePersonalRating(UpdatePersonalRatingRequest request, Guid userId, Guid mediaId)
+        public async Task<MediaProgressResponse> UpdatePersonalRating(UpdatePersonalRatingRequest request, Guid userId, Guid mediaId)
         {
-            _userService.GetUser(userId);
-            var media = _mediaService.GetMedia(mediaId);
-            var mediaProgress = GetMediaProgress(userId, mediaId);
+            await _userService.GetUser(userId);
+            var media = await _mediaService.GetMedia(mediaId);
+            var mediaProgress = await GetMediaProgress(userId, mediaId);
 
             if (mediaProgress == null)
             {
@@ -95,6 +98,8 @@ namespace WatchTrackerAPI.Services
             ValidatePersonalRating(request.PersonalRating, mediaProgress.EpisodesWatched, mediaProgress.Status);
             ValidateRatingValue(request.PersonalRating);
             mediaProgress.PersonalRating = request.PersonalRating;
+
+            await _dbContext.SaveChangesAsync();
 
             return new MediaProgressResponse
             {
@@ -112,24 +117,28 @@ namespace WatchTrackerAPI.Services
             };
         }
 
-        public PagedResponse<MediaProgressResponse> GetAllUserProgress(int page, int pageSize, Guid userId, WatchStatus? status)
+        public async Task<PagedResponse<MediaProgressResponse>> GetAllUserProgress(Guid userId, MediaProgressQueryParams mediaProgressParams)
         {
 
-            var allMediaProgress = _dbContext.MediaProgresses;
-            allMediaProgress = allMediaProgress.Where(p => p.UserId == userId).ToList();
+            IQueryable<UserMediaProgress> allMediaProgress = _dbContext.MediaProgresses;
+            allMediaProgress = allMediaProgress.Where(p => p.UserId == userId && p.isDeleted == false); //searching progresses
 
-            if (status != null) //filter by status
+            if (mediaProgressParams.Status != null) //filter by status
             {
-                allMediaProgress = allMediaProgress.Where(m => m.Status == status).ToList();
+                allMediaProgress = allMediaProgress.Where(m => m.Status == mediaProgressParams.Status);
             }
 
-            var totalCount = allMediaProgress.Count;
-            allMediaProgress = allMediaProgress.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+            var totalCount = await allMediaProgress.CountAsync();
+            allMediaProgress = allMediaProgress.Skip((mediaProgressParams.Page - 1) * mediaProgressParams.PageSize).Take(mediaProgressParams.PageSize);
+            var totalPages = (int)Math.Ceiling((double)totalCount / mediaProgressParams.PageSize);
 
-            var items = allMediaProgress.Select(mediaProgess =>
+            var progresses = await allMediaProgress.ToListAsync();
+            var mediaIds = progresses.Select(progress => progress.MediaId).ToList(); //all media ids
+            var medias = await _dbContext.MediaContent.Where(media => mediaIds.Contains(media.Id)).ToListAsync(); // WHERE mediaId IN mediaIds
+
+            var items = progresses.Select(mediaProgess =>
             {
-                var media = _mediaService.GetMedia(mediaProgess.MediaId);
+                var media = medias.First(m => m.Id == mediaProgess.MediaId);
 
                 return new MediaProgressResponse
                 {
@@ -145,22 +154,36 @@ namespace WatchTrackerAPI.Services
                     FinishedAt = mediaProgess.FinishedAt,
                     LastUpdatedAt = mediaProgess.LastUpdatedAt
                 };
-            });
+            }).ToList();
 
             var paginatedResponse = new PagedResponse<MediaProgressResponse>
             {
                 Items = items,
-                Page = page,
-                PageSize = pageSize,
+                Page = mediaProgressParams.Page,
+                PageSize = mediaProgressParams.PageSize,
                 TotalPages = totalPages,
                 TotalCount = totalCount,
             };
             return paginatedResponse;
         }
 
-        private UserMediaProgress? GetMediaProgress(Guid userId, Guid mediaId)
+        public async Task DeleteUserProgress(Guid userId, Guid mediaId) //if user wants to delete a movie, show, etc
         {
-            var mediaProgress = _dbContext.MediaProgresses.FirstOrDefault(p => p.UserId == userId && p.MediaId == mediaId);
+            var exists = await GetMediaProgress(userId, mediaId);
+            if (exists == null)
+            {
+                throw new InvalidOperationException("The media progress doesn't exists");
+            }
+            else
+            {
+                exists.isDeleted = true;
+                await _dbContext.SaveChangesAsync(); // save the new row state
+            }
+        }
+
+        private async Task<UserMediaProgress?> GetMediaProgress(Guid userId, Guid mediaId)
+        {
+            var mediaProgress = await _dbContext.MediaProgresses.FirstOrDefaultAsync(p => p.UserId == userId && p.MediaId == mediaId && p.isDeleted == false);
             return mediaProgress;
         }
 

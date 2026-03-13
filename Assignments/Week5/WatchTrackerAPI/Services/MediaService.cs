@@ -1,4 +1,5 @@
-﻿using WatchTrackerAPI.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WatchTrackerAPI.Data;
 using WatchTrackerAPI.DTOs;
 using WatchTrackerAPI.Interfaces;
 using WatchTrackerAPI.Models.Entities;
@@ -14,9 +15,9 @@ namespace WatchTrackerAPI.Services
             _dbContext = dbContext;
         }
 
-        public MediaResponse CreateMedia(CreateMediaRequest request)
+        public async Task<MediaResponse> CreateMedia(CreateMediaRequest request)
         {
-            if ((request.Type == MediaTypes.Anime || request.Type == MediaTypes.TVShow) && (request.TotalEpisodes == null))
+            if ((request.Type == MediaTypes.Anime || request.Type == MediaTypes.TVShow) && (request.TotalEpisodes == null)) //tv show and anime are series
             {
                 throw new InvalidOperationException($"The type {request.Type} needs a number of episodes");
             }
@@ -32,6 +33,8 @@ namespace WatchTrackerAPI.Services
             };
 
             _dbContext.MediaContent.Add(newMedia);
+            await _dbContext.SaveChangesAsync();
+
             return new MediaResponse
             {
                 Id = newMedia.Id,
@@ -44,19 +47,18 @@ namespace WatchTrackerAPI.Services
             };
         }
 
-        public PagedResponse<MediaResponse> GetAllMedia(int page, int pageSize, MediaTypes? type)
+        public async Task<PagedResponse<MediaResponse>> GetAllMedia(MediaQueryParams mediaParams)
         {
-            var allMedia = _dbContext.MediaContent;
-            if (type != null) //filter by type
+            IQueryable<Media> query = _dbContext.MediaContent;
+            if (mediaParams.Type != null) //filter by type
             {
-                allMedia = allMedia.Where(m => m.Type == type).ToList();
+                query = query.Where(m => m.Type == mediaParams.Type);
             }
+            var totalCount = await query.CountAsync();
+            query = query.Skip((mediaParams.Page - 1) * mediaParams.PageSize).Take(mediaParams.PageSize);
+            var totalPages = (int)Math.Ceiling((double)totalCount / mediaParams.PageSize);
 
-            var totalCount = allMedia.Count;
-            allMedia = allMedia.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-
-            var items = allMedia.Select(media => new MediaResponse
+            var items = await query.Select(media => new MediaResponse
             {
                 Id = media.Id,
                 Title = media.Title,
@@ -65,22 +67,22 @@ namespace WatchTrackerAPI.Services
                 ReleaseDate = media.ReleaseDate,
                 Genre = media.Genre,
                 CreatedAt = media.CreatedAt,
-            });
+            }).ToListAsync();
 
             var paginatedResponse = new PagedResponse<MediaResponse>
             {
                 Items = items,
-                Page = page,
-                PageSize = pageSize,
+                Page = mediaParams.Page,
+                PageSize = mediaParams.PageSize,
                 TotalPages = totalPages,
                 TotalCount = totalCount,
             };
             return paginatedResponse;
         }
 
-        public MediaResponse GetMedia(Guid id)
+        public async Task<MediaResponse> GetMedia(Guid id)
         {
-            var media = _dbContext.MediaContent.FirstOrDefault(media => media.Id == id);
+            var media = await _dbContext.MediaContent.FirstOrDefaultAsync(media => media.Id == id);
             if (media == null)
             {
                 throw new InvalidOperationException($"The Media with {id} was not found");
@@ -97,6 +99,23 @@ namespace WatchTrackerAPI.Services
                 CreatedAt = media.CreatedAt,
             };
             return response;
+        }
+
+        public async Task DeleteMedia(Guid id)
+        {
+            var media = await FindValidMedia(id);
+            _dbContext.MediaContent.Remove(media);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task<Media> FindValidMedia(Guid mediaId)
+        {
+            var media = await _dbContext.MediaContent.FirstOrDefaultAsync(media => media.Id == mediaId);
+            if (media == null)
+            {
+                throw new InvalidOperationException($"The Media with {mediaId} was not found");
+            }
+            return media;
         }
     }
 }

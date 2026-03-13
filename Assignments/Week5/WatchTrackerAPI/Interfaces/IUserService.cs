@@ -4,7 +4,11 @@ namespace WatchTrackerAPI.Interfaces
 {
     public interface IUserService
     {
-        public UserResponse CreateUser(CreateUserRequest user);
-        public UserResponse GetUser(Guid userId);
+        public Task<UserResponse> CreateUser(CreateUserRequest user);
+
+        public Task<List<UserResponse>> GetAllUsers();
+        public Task<UserResponse> GetUser(Guid userId);
+
+        public Task DeleteUser(Guid userId);
     }
 }
