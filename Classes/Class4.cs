@@ -10,6 +10,7 @@ namespace Classes.Class4
 {
     internal class Class4
     {
+        /*
         static async Task Main()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -27,7 +28,7 @@ namespace Classes.Class4
 
             Banner("FIN");
         }
-
+        */
         static void Banner(string title)
         {
             Console.WriteLine();
