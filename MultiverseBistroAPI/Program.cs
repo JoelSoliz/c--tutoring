@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using MultiverseBistroAPI.Data;
-using MultiverseBistroAPI.Interfaces;
+using MultiverseBistroAPI.Interfaces.Repositories;
 using MultiverseBistroAPI.Interfaces.Services;
+using MultiverseBistroAPI.Repositories;
+using MultiverseBistroAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,10 @@ builder.Services.AddSwaggerGen();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDBContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
+builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+
 builder.Services.AddScoped<IRecipeService, RecipeService>();
 
 var app = builder.Build();
