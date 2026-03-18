@@ -46,6 +46,7 @@
         #endregion
 
         #region Collatz Polynomial
+        /*
         string degree = Console.ReadLine();
         int N = int.Parse(degree);
         string[] polinomial = Console.ReadLine().Split(' ');
@@ -81,6 +82,47 @@
         }
 
         Console.WriteLine(steps);
+        */
+        #endregion
+
+        #region Finding Privacy
+        string[] data = Console.ReadLine().Split(' ');
+        int K = int.Parse(data[0]);
+        int N = int.Parse(data[1]);
+
+        bool[] toilets = new bool[N];
+
+        if (K < (N - 1) / 2 || K > (N + 1) / 2)
+        {
+            Console.WriteLine("*");
+            return;
+        }
+
+        int count = 0;
+        int start = (K == (N + 1) / 2) ? 0 : 1;
+
+        for (int i = start; i < toilets.Length; i += 2)
+        {
+            toilets[i] = true;
+            count++;
+            if (count == K)
+            {
+                break;
+            }
+        }
+
+        for (int i = 0; i < toilets.Length; i++)
+        {
+            if (toilets[i] == true)
+            {
+                Console.Write("X");
+            }
+            else
+            {
+                Console.Write("-");
+            }
+        }
+        Console.WriteLine();
         #endregion
     }
 }
