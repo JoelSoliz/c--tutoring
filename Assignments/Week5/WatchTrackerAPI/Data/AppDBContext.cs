@@ -22,9 +22,24 @@ namespace WatchTrackerAPI.Data
                 .HasOne(mediaProgress => mediaProgress.Media)
                 .WithMany(progress => progress.UserProgress)
                 .HasForeignKey(mediaProgress => mediaProgress.MediaId);
+
+            modelBuilder.Entity<Media>()
+                .HasOne(media => media.Genre)
+                .WithMany(genre => genre.Medias)
+                .HasForeignKey(media => media.GenreId);
+
+            modelBuilder.Entity<Media>()
+                .Property(media => media.Type)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<UserMediaProgress>()
+                .Property(mp => mp.Status)
+                .HasConversion<string>();
         }
 
         public DbSet<Media> MediaContent { get; set; }
+
+        public DbSet<Genre> Genres { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserMediaProgress> MediaProgresses { get; set; }
     }

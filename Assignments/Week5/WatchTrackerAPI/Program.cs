@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using WatchTrackerAPI.Data;
-using WatchTrackerAPI.Interfaces;
+using WatchTrackerAPI.Interfaces.Repositories;
+using WatchTrackerAPI.Interfaces.Services;
+using WatchTrackerAPI.Repositories;
 using WatchTrackerAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,11 @@ builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMediaProgressService, MediaProgressService>();
 builder.Services.AddScoped<IUserStatsService, UserStatsService>();
+
+builder.Services.AddScoped<IMediaRepository, MediaRepository>();
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IMediaProgressRepository, MediaProgressRepository>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
