@@ -1,6 +1,6 @@
 ﻿using WatchTrackerAPI.DTOs;
 
-namespace WatchTrackerAPI.Interfaces
+namespace WatchTrackerAPI.Interfaces.Services
 {
     public interface IUserService
     {

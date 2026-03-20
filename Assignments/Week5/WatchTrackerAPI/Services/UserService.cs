@@ -1,17 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WatchTrackerAPI.Data;
-using WatchTrackerAPI.DTOs;
-using WatchTrackerAPI.Interfaces;
+﻿using WatchTrackerAPI.DTOs;
+using WatchTrackerAPI.Interfaces.Repositories;
+using WatchTrackerAPI.Interfaces.Services;
 using WatchTrackerAPI.Models.Entities;
 
 namespace WatchTrackerAPI.Services
 {
     public class UserService : IUserService
     {
-        private readonly AppDBContext _dbContext;
-        public UserService(AppDBContext dbContext)
+        private readonly IUserRepository _userRepository;
+        public UserService(IUserRepository userRepository)
         {
-            _dbContext = dbContext;
+            _userRepository = userRepository;
         }
         public async Task<UserResponse> CreateUser(CreateUserRequest user)
         {
@@ -22,8 +21,7 @@ namespace WatchTrackerAPI.Services
                 Email = user.Email,
             };
 
-            _dbContext.Users.Add(newUser);
-            await _dbContext.SaveChangesAsync();
+            await _userRepository.CreateUser(newUser);
 
             return new UserResponse
             {
@@ -49,27 +47,33 @@ namespace WatchTrackerAPI.Services
 
         public async Task<List<UserResponse>> GetAllUsers()
         {
-            IQueryable<User> query = _dbContext.Users;
-            var users = await query.Select(user => new UserResponse
+            var users = await _userRepository.GetAllUsers();
+            return users.Select(user => new UserResponse
             {
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
                 Progresses = user.Progresses,
-            }).ToListAsync();
 
-            return users;
+            }).ToList();
         }
         public async Task DeleteUser(Guid userId)
         {
-            var user = await FindValidUser(userId);
-            _dbContext.Users.Remove(user);
-            await _dbContext.SaveChangesAsync();
+            var exists = await FindValidUser(userId);
+            if (exists == null)
+            {
+                throw new InvalidOperationException("The user doesn't exists");
+            }
+            else
+            {
+                exists.IsDeleted = true;
+                await _userRepository.UpdateUser(exists);
+            }
         }
 
         private async Task<User> FindValidUser(Guid userId)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
+            var user = await _userRepository.GetUser(userId);
             if (user == null)
             {
                 throw new InvalidOperationException($"The User with {userId} was not found");
