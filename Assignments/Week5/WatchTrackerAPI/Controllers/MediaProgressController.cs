@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WatchTrackerAPI.DTOs;
-using WatchTrackerAPI.Interfaces;
+using WatchTrackerAPI.Interfaces.Services;
 
 namespace WatchTrackerAPI.Controllers
 {
@@ -16,12 +16,12 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProgress(CreateOrUpdateProgressRequest request, [FromRoute] Guid userId)
+        public async Task<IActionResult> CreateProgress(CreateProgressRequest request, [FromRoute] Guid userId)
         {
             try
             {
-                var progress = await _mediaProgressService.CreateOrUpdateProgress(request, userId);
-                return Ok(progress);
+                var progress = await _mediaProgressService.CreateUserProgress(request, userId);
+                return CreatedAtAction("GetUserMediaProgress", new { userId = progress.UserId, mediaId = progress.MediaId }, progress);
             }
             catch (InvalidOperationException exception)
             {
@@ -29,12 +29,12 @@ namespace WatchTrackerAPI.Controllers
             }
         }
 
-        [HttpPatch("{mediaId}/rating")]
-        public async Task<IActionResult> UpdatePersonalRating(UpdatePersonalRatingRequest request, [FromRoute] Guid userId, [FromRoute] Guid mediaId)
+        [HttpPatch("{mediaId}")]
+        public async Task<IActionResult> UpdateUserMediaProgress(UpdateProgressRequest request, [FromRoute] Guid userId, [FromRoute] Guid mediaId)
         {
             try
             {
-                var updatedProgress = await _mediaProgressService.UpdatePersonalRating(request, userId, mediaId);
+                var updatedProgress = await _mediaProgressService.UpdateUserProgress(request, userId, mediaId);
                 return Ok(updatedProgress);
             }
             catch (InvalidOperationException exception)
@@ -48,6 +48,20 @@ namespace WatchTrackerAPI.Controllers
         {
             var userMediaProgress = await _mediaProgressService.GetAllUserProgress(userId, mediaProgressParams);
             return Ok(userMediaProgress);
+        }
+
+        [HttpGet("{mediaId}")]
+        public async Task<IActionResult> GetUserMediaProgress([FromRoute] Guid userId, [FromRoute] Guid mediaId)
+        {
+            try
+            {
+                var progress = await _mediaProgressService.GetUserProgress(userId, mediaId);
+                return Ok(progress);
+            }
+            catch (InvalidOperationException exception)
+            {
+                return NotFound(exception.Message);
+            }
         }
 
         [HttpDelete("{mediaId}")]

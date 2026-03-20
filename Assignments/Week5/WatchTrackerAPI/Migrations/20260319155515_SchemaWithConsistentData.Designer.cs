@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WatchTrackerAPI.Data;
 
@@ -11,9 +12,11 @@ using WatchTrackerAPI.Data;
 namespace WatchTrackerAPI.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260319155515_SchemaWithConsistentData")]
+    partial class SchemaWithConsistentData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace WatchTrackerAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("WatchTrackerAPI.Models.Entities.Genre", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Genres");
-                });
 
             modelBuilder.Entity("WatchTrackerAPI.Models.Entities.Media", b =>
                 {
@@ -46,11 +34,9 @@ namespace WatchTrackerAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid>("GenreId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<string>("Genre")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime(6)");
@@ -68,8 +54,6 @@ namespace WatchTrackerAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GenreId");
-
                     b.ToTable("MediaContent");
                 });
 
@@ -82,9 +66,6 @@ namespace WatchTrackerAPI.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -132,17 +113,6 @@ namespace WatchTrackerAPI.Migrations
                     b.ToTable("MediaProgresses");
                 });
 
-            modelBuilder.Entity("WatchTrackerAPI.Models.Entities.Media", b =>
-                {
-                    b.HasOne("WatchTrackerAPI.Models.Entities.Genre", "Genre")
-                        .WithMany("Medias")
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Genre");
-                });
-
             modelBuilder.Entity("WatchTrackerAPI.Models.Entities.UserMediaProgress", b =>
                 {
                     b.HasOne("WatchTrackerAPI.Models.Entities.Media", "Media")
@@ -160,11 +130,6 @@ namespace WatchTrackerAPI.Migrations
                     b.Navigation("Media");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WatchTrackerAPI.Models.Entities.Genre", b =>
-                {
-                    b.Navigation("Medias");
                 });
 
             modelBuilder.Entity("WatchTrackerAPI.Models.Entities.Media", b =>

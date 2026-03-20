@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WatchTrackerAPI.DTOs;
-using WatchTrackerAPI.Interfaces;
+using WatchTrackerAPI.Interfaces.Services;
 
 namespace WatchTrackerAPI.Controllers
 {
@@ -16,7 +16,7 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpGet("stats/top-anime")]
-        public async Task<IActionResult> GetTopCompletedAnimes([FromRoute] Guid userId, [FromQuery] TopAnimeQueryParams animeParams)
+        public async Task<IActionResult> GetTopCompletedAnimes([FromRoute] Guid userId, [FromQuery] TopRankingQueryParams animeParams)
         {
             var topAnime = await _userStatsService.GetTopAnimes(userId, animeParams);
             return Ok(topAnime);

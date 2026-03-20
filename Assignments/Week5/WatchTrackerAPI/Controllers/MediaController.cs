@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WatchTrackerAPI.DTOs;
-using WatchTrackerAPI.Interfaces;
+using WatchTrackerAPI.Interfaces.Services;
 
 namespace WatchTrackerAPI.Controllers
 {
