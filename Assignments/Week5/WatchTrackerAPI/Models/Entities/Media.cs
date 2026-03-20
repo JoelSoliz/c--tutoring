@@ -9,8 +9,12 @@ namespace WatchTrackerAPI.Models.Entities
         public MediaTypes Type { get; set; }
         public int? TotalEpisodes { get; set; }
         public DateTime ReleaseDate { get; set; }
-        public string Genre { get; set; }
+        public Guid GenreId { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<UserMediaProgress> UserProgress { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
+
+        public Genre Genre { get; set; }
     }
 }

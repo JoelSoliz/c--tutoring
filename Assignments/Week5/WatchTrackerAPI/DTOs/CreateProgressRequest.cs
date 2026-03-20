@@ -3,7 +3,7 @@ using WatchTrackerAPI.Models.Enums;
 
 namespace WatchTrackerAPI.DTOs
 {
-    public class CreateOrUpdateProgressRequest
+    public class CreateProgressRequest
     {
         [Required]
         public Guid MediaId { get; set; }

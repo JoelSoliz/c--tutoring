@@ -1,6 +1,6 @@
 ﻿namespace WatchTrackerAPI.DTOs
 {
-    public class TopAnimeQueryParams
+    public class TopRankingQueryParams
     {
         public int Limit { get; set; } = 10;
     }

@@ -8,6 +8,7 @@ namespace WatchTrackerAPI.DTOs
         public Guid MediaId { get; set; }
         public string MediaTitle { get; set; }
         public MediaTypes MediaType { get; set; }
+        public string Genre { get; set; }
         public int? TotalEpisodes { get; set; }
         public int EpisodesWatched { get; set; }
         public WatchStatus WatchStatus { get; set; }

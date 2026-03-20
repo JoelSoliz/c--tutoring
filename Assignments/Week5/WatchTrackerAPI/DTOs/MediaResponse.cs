@@ -9,7 +9,7 @@ namespace WatchTrackerAPI.DTOs
         public MediaTypes Type { get; set; }
         public int? TotalEpisodes { get; set; }
         public DateTime ReleaseDate { get; set; }
-        public string Genre { get; set; }
+        public GenreResponse Genre { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

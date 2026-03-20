@@ -13,7 +13,7 @@ namespace WatchTrackerAPI.Models.Entities
         public WatchStatus Status { get; set; }
         public int? PersonalRating { get; set; }
 
-        public bool isDeleted { get; set; } = false;
+        public bool IsDeleted { get; set; } = false;
 
         public User User { get; set; }
         public Media Media { get; set; }
