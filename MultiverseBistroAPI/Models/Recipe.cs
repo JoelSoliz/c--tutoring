@@ -9,6 +9,9 @@
         public DateTime CreatedAt { get; set; }
         public string Image { get; set; }
 
+        public Guid CreatedBy { get; set; }
+        public User Creator { get; set; }
+
         public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
     }
 }

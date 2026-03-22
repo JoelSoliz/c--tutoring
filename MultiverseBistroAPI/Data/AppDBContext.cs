@@ -25,10 +25,19 @@ namespace MultiverseBistroAPI.Data
                 .HasOne(recipeIngredient => recipeIngredient.Ingredient)
                 .WithMany(ingredient => ingredient.RecipeIngredients)
                 .HasForeignKey(recipeIngredient => recipeIngredient.IngredientId);
+
+            modelBuilder.Entity<Recipe>()
+                .HasOne(recipe => recipe.Creator)
+                .WithMany(user => user.Recipes)
+                .HasForeignKey(recipe => recipe.CreatedBy);
+
+            modelBuilder.Entity<User>()
+                .HasKey(user => user.UserId);
         }
 
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
