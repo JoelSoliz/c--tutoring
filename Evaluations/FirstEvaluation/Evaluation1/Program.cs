@@ -117,6 +117,8 @@
         */
         #endregion
 
+        #region F
+        /*
         string[] dollsData = Console.ReadLine().Split(' ');
         int S = int.Parse(dollsData[0]);
         int X = int.Parse(dollsData[1]);
@@ -128,5 +130,93 @@
             counter++;
         }
         Console.WriteLine(counter);
+        */
+        #endregion
+
+        #region G
+        /*
+        string[] data = Console.ReadLine().Split(" ");
+        int n = int.Parse(data[0]); //applicants
+        int m = int.Parse(data[1]); //free departments
+        int k = int.Parse(data[2]); // difference
+
+        int[] desirableSizes = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
+        int[] availableSizes = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
+
+        Array.Sort(desirableSizes);
+        Array.Sort(availableSizes);
+
+        int i = 0;
+        int j = 0;
+        int counter = 0;
+
+        while (i < n && j < m)
+        {
+            if (availableSizes[j] < desirableSizes[i] - k) //30 < 40
+            {
+                j++; // cointune iterating departments
+            }
+            else if (availableSizes[j] > desirableSizes[i] + k) //60 > [40, 50]
+            {
+                i++;
+            }
+            else
+            {
+                i++; j++; counter++;
+            }
+        }
+        Console.WriteLine(counter);
+        */
+
+        #endregion
+
+        #region H
+        /*
+        string[] data = Console.ReadLine().Split(" ");
+        int n = int.Parse(data[0]); //children
+        int x = int.Parse(data[1]); // maximum weight
+
+        int[] weights = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
+        Array.Sort(weights);
+
+        int left = 0; //most light
+        int right = n - 1; // most heavy
+        int gondolas = 0;
+
+        while (left <= right)
+        {
+            if (weights[left] + weights[right] <= x)
+            {
+                left++; right--; gondolas++;//we don't need the most heavy anymore
+            }
+            else
+            {
+                right--; gondolas++;
+            }
+        }
+        Console.WriteLine(gondolas);
+        */
+        #endregion
+
+        #region I
+        /*
+        int N = int.Parse(Console.ReadLine());
+        int[] numbers = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
+        var distinct = new HashSet<int>(numbers);
+        Console.WriteLine(distinct.Count);
+        */
+        #endregion
+
+        int n = int.Parse(Console.ReadLine());
+        long[] numbers = Console.ReadLine().Split(" ").Select(long.Parse).ToArray();
+        long currentSum = numbers[0];
+        long maxSum = numbers[0];
+        for (int i = 1; i < n; i++)
+        {
+            currentSum = Math.Max(numbers[i], currentSum + numbers[i]);
+            maxSum = Math.Max(maxSum, currentSum);
+        }
+        Console.WriteLine(maxSum);
+
     }
 }
