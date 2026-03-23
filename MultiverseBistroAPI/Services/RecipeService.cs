@@ -9,15 +9,26 @@ namespace MultiverseBistroAPI.Services
     {
         private readonly IIngredientRepository _ingredientRepository;
         private readonly IRecipeRepository _recipeRepository;
+        private readonly IUserRepository _userRepository;
 
-        public RecipeService(IRecipeRepository recipeRepository, IIngredientRepository ingredientRepository)
+        public RecipeService(
+            IRecipeRepository recipeRepository,
+            IIngredientRepository ingredientRepository,
+            IUserRepository userRepository)
         {
             _ingredientRepository = ingredientRepository;
             _recipeRepository = recipeRepository;
+            _userRepository = userRepository;
         }
 
-        public RecipeResponseDTO CreateRecipe(RecipeCreateDTO recipeCreateDTO)
+        public RecipeResponseDTO CreateRecipe(RecipeCreateDTO recipeCreateDTO, string userEmail)
         {
+            var user = _userRepository.GetUserByEmail(userEmail);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
             var newRecipe = new Recipe
             {
                 Id = Guid.NewGuid(),
@@ -26,6 +37,7 @@ namespace MultiverseBistroAPI.Services
                 CreatedAt = DateTime.UtcNow,
                 Instructions = recipeCreateDTO.Instructions,
                 Image = string.Empty,
+                CreatedBy = user.UserId
             };
             foreach (var ingr in recipeCreateDTO.Ingredients)
             {
@@ -66,6 +78,7 @@ namespace MultiverseBistroAPI.Services
                 }).ToList(),
                 Image = newRecipe.Image,
                 Instructions = newRecipe.Instructions,
+                CreatedBy = user.Email
             };
         }
 
@@ -105,14 +118,14 @@ namespace MultiverseBistroAPI.Services
                 }).ToList(),
                 Image = recipe.Image,
                 Instructions = recipe.Instructions,
+                CreatedBy = recipe.Creator.Email
             };
         }
 
         public RecipePaginatedResponseDTO GetRecipes(int limit, int page)
         {
-            var recipes = _recipeRepository.GetAllRecipes();
-            var response = recipes.Skip((page - 1) * limit)
-                .Take(limit)
+            var recipes = _recipeRepository.GetAllRecipes(limit, page);
+            var response = recipes
                 .Select(recipe => new RecipeResponseDTO
                 {
                     Id = recipe.Id,
@@ -127,6 +140,7 @@ namespace MultiverseBistroAPI.Services
                     }).ToList(),
                     Image = recipe.Image,
                     Instructions = recipe.Instructions,
+                    CreatedBy = recipe.Creator.Email
                 });
             return new RecipePaginatedResponseDTO
             {
@@ -170,6 +184,7 @@ namespace MultiverseBistroAPI.Services
                 }).ToList(),
                 Image = recipe.Image,
                 Instructions = recipe.Instructions,
+                CreatedBy = recipe.Creator.Email
             };
         }
     }

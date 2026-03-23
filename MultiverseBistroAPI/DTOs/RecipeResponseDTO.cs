@@ -8,6 +8,7 @@
         public List<RecipeIngredientDTO> Ingredients { get; set; }
         public string Instructions { get; set; }
         public string Image { get; set; }
+        public string CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 

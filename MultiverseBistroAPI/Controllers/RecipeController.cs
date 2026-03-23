@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MultiverseBistroAPI.DTOs;
 using MultiverseBistroAPI.Interfaces.Services;
+using System.Security.Claims;
 
 namespace MultiverseBistroAPI.Controllers
 {
@@ -37,13 +39,16 @@ namespace MultiverseBistroAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Create(RecipeCreateDTO data)
         {
-            var recipe = _service.CreateRecipe(data);
+            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var recipe = _service.CreateRecipe(data, userEmail);
             return Ok(recipe);
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
             try
@@ -58,6 +63,7 @@ namespace MultiverseBistroAPI.Controllers
         }
 
         [HttpPost("{id}/image")]
+        [Authorize]
         public IActionResult UploadImage(Guid id, IFormFile file)
         {
             try
