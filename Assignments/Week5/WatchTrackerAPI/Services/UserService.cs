@@ -1,4 +1,4 @@
-﻿using WatchTrackerAPI.DTOs;
+﻿using WatchTrackerAPI.DTOs.Responses;
 using WatchTrackerAPI.Interfaces.Repositories;
 using WatchTrackerAPI.Interfaces.Services;
 using WatchTrackerAPI.Models.Entities;
@@ -11,25 +11,6 @@ namespace WatchTrackerAPI.Services
         public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-        }
-        public async Task<UserResponse> CreateUser(CreateUserRequest user)
-        {
-            var newUser = new User
-            {
-                Id = Guid.NewGuid(),
-                Name = user.Name,
-                Email = user.Email,
-            };
-
-            await _userRepository.CreateUser(newUser);
-
-            return new UserResponse
-            {
-                Id = newUser.Id,
-                Name = newUser.Name,
-                Email = newUser.Email,
-                Progresses = newUser.Progresses,
-            };
         }
 
         public async Task<UserResponse> GetUser(Guid userId)

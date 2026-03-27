@@ -8,6 +8,7 @@ namespace WatchTrackerAPI.Interfaces.Repositories
 
         public Task UpdateUser(User user);
         public Task<User?> GetUser(Guid userId);
+        public Task<User?> GetUserByEmail(string email);
 
         public Task<List<User>> GetAllUsers();
     }

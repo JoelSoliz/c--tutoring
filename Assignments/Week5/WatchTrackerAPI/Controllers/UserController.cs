@@ -1,24 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WatchTrackerAPI.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WatchTrackerAPI.Interfaces.Services;
 
 namespace WatchTrackerAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Moderator")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
         public UserController(IUserService userService)
         {
             _userService = userService;
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateUser(CreateUserRequest newUser)
-        {
-            var user = await _userService.CreateUser(newUser);
-            return CreatedAtAction("GetUser", new { userId = user.Id }, user);
         }
 
         [HttpGet("{userId}")]
