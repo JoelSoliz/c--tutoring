@@ -86,11 +86,13 @@
         #endregion
 
         #region Finding Privacy
+
         string[] data = Console.ReadLine().Split(' ');
         int K = int.Parse(data[0]);
         int N = int.Parse(data[1]);
 
-        bool[] toilets = new bool[N];
+        int y = N - 2 * K; //B: X-
+        int x = 3 * K - N; //A: X--
 
         if (K < (N - 1) / 2 || K > (N + 1) / 2)
         {
@@ -98,31 +100,64 @@
             return;
         }
 
-        int count = 0;
-        int start = (K == (N + 1) / 2) ? 0 : 1;
+        if (K == (N - 1) / 2) Console.Write("-"); //if it's minimum
 
-        for (int i = start; i < toilets.Length; i += 2)
+        for (int i = 0; i < K; i++)
         {
-            toilets[i] = true;
-            count++;
-            if (count == K)
+            bool isLastIteration = (i == K - 1);
+            if (y > 0)
             {
-                break;
-            }
-        }
-
-        for (int i = 0; i < toilets.Length; i++)
-        {
-            if (toilets[i] == true)
-            {
-                Console.Write("X");
+                Console.Write(isLastIteration ? "X-" : "X--");
+                y--;
             }
             else
             {
-                Console.Write("-");
+                Console.Write(isLastIteration ? "X" : "X-");
+                x--;
             }
         }
         Console.WriteLine();
+
+        #endregion
+
+        #region Kool Strings
+        /*
+        string[] data = Console.ReadLine().Split(" ");
+        int K = int.Parse(data[0]);
+        string S = data[1];
+        char[] characters = S.ToCharArray(); //here we're going to do the flips
+
+        int operations = 0;
+        int count = 1;
+
+        for (int i = 1; i < S.Length; i++)
+        {
+            if (characters[i] == characters[i - 1])
+            {
+                count++;
+            }
+            else // if they're different
+            {
+                count = 1;
+            }
+
+            if (count == K)
+            {
+                if (characters[i] == '1')
+                {
+                    characters[i] = '0';
+                }
+                else
+                {
+                    characters[i] = '1';
+                }
+
+                operations++;
+                count = 1;
+            }
+        }
+        Console.WriteLine(operations + " " + new string(characters));
+        */
         #endregion
     }
 }
