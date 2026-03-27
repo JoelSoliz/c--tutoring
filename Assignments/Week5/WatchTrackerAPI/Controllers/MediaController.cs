@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WatchTrackerAPI.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using WatchTrackerAPI.DTOs.Parameters;
+using WatchTrackerAPI.DTOs.Requests;
 using WatchTrackerAPI.Interfaces.Services;
 
 namespace WatchTrackerAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Moderator")]
     public class MediaController : Controller
     {
         private readonly IMediaService _mediaService;
@@ -15,6 +18,7 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllMedia([FromQuery] MediaQueryParams mediaParams)
         {
             var media = await _mediaService.GetAllMedia(mediaParams);
