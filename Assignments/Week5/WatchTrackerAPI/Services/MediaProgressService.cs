@@ -1,4 +1,6 @@
-﻿using WatchTrackerAPI.DTOs;
+﻿using WatchTrackerAPI.DTOs.Parameters;
+using WatchTrackerAPI.DTOs.Requests;
+using WatchTrackerAPI.DTOs.Responses;
 using WatchTrackerAPI.Interfaces.Repositories;
 using WatchTrackerAPI.Interfaces.Services;
 using WatchTrackerAPI.Models.Entities;
@@ -9,14 +11,12 @@ namespace WatchTrackerAPI.Services
     public class MediaProgressService : IMediaProgressService
     {
         private readonly IMediaProgressRepository _mediaProgressRepository;
-        private readonly IMediaRepository _mediaRepository;
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
 
-        public MediaProgressService(IMediaProgressRepository mediaProgressRepository, IMediaRepository mediaRepository, IMediaService mediaService, IUserService userService)
+        public MediaProgressService(IMediaProgressRepository mediaProgressRepository, IMediaService mediaService, IUserService userService)
         {
             _mediaProgressRepository = mediaProgressRepository;
-            _mediaRepository = mediaRepository;
             _mediaService = mediaService;
             _userService = userService;
         }
@@ -49,16 +49,7 @@ namespace WatchTrackerAPI.Services
             {
                 UserId = userId,
                 MediaId = newMedia.MediaId,
-                MediaTitle = media.Title,
-                MediaType = media.Type,
-                Genre = media.Genre.Name,
-                TotalEpisodes = media.TotalEpisodes,
-                EpisodesWatched = newMedia.EpisodesWatched,
-                WatchStatus = newMedia.Status,
-                PersonalRating = newMedia.PersonalRating,
-                StartedAt = newMedia.StartedAt,
-                FinishedAt = newMedia.FinishedAt,
-                LastUpdatedAt = newMedia.LastUpdatedAt,
+                MediaTitle = media.Title
             };
         }
 
@@ -89,16 +80,7 @@ namespace WatchTrackerAPI.Services
             {
                 UserId = userId,
                 MediaId = mediaId,
-                MediaTitle = media.Title,
-                MediaType = media.Type,
-                Genre = media.Genre.Name,
-                TotalEpisodes = media.TotalEpisodes,
-                EpisodesWatched = mediaProgress.EpisodesWatched,
-                WatchStatus = mediaProgress.Status,
-                PersonalRating = mediaProgress.PersonalRating,
-                StartedAt = mediaProgress.StartedAt,
-                FinishedAt = mediaProgress.FinishedAt,
-                LastUpdatedAt = mediaProgress.LastUpdatedAt,
+                MediaTitle = media.Title
             };
 
         }
@@ -109,27 +91,13 @@ namespace WatchTrackerAPI.Services
             var allMediaProgress = await _mediaProgressRepository.GetAllMediaProgress(mediaProgressParams.Page, mediaProgressParams.PageSize, mediaProgressParams.Status, userId);
             var totalPages = (int)Math.Ceiling((double)allMediaProgress.TotalCount / mediaProgressParams.PageSize);
 
-            var mediaIds = allMediaProgress.Items.Select(progress => progress.MediaId).ToList(); //all media ids
-            var medias = await _mediaRepository.GetMediaByIds(mediaIds);
-
             var items = allMediaProgress.Items.Select(mediaProgess =>
             {
-                var media = medias.First(m => m.Id == mediaProgess.MediaId);
-
                 return new MediaProgressResponse
                 {
                     UserId = userId,
-                    MediaId = media.Id,
-                    MediaTitle = media.Title,
-                    MediaType = media.Type,
-                    Genre = media.Genre.Name,
-                    TotalEpisodes = media.TotalEpisodes,
-                    EpisodesWatched = mediaProgess.EpisodesWatched,
-                    WatchStatus = mediaProgess.Status,
-                    PersonalRating = mediaProgess.PersonalRating,
-                    StartedAt = mediaProgess.StartedAt,
-                    FinishedAt = mediaProgess.FinishedAt,
-                    LastUpdatedAt = mediaProgess.LastUpdatedAt
+                    MediaId = mediaProgess.MediaId,
+                    MediaTitle = mediaProgess.Media.Title
                 };
             }).ToList();
 
@@ -151,22 +119,11 @@ namespace WatchTrackerAPI.Services
             {
                 throw new InvalidOperationException("Media progress not found");
             }
-            var media = await _mediaService.GetMedia(mediaId);
             var response = new MediaProgressResponse
             {
                 UserId = userId,
                 MediaId = mediaId,
-                MediaTitle = media.Title,
-                MediaType = media.Type,
-                Genre = media.Genre.Name,
-                TotalEpisodes = media.TotalEpisodes,
-                EpisodesWatched = mediaProgress.EpisodesWatched,
-                WatchStatus = mediaProgress.Status,
-                PersonalRating = mediaProgress.PersonalRating,
-                StartedAt = mediaProgress.StartedAt,
-                FinishedAt = mediaProgress.FinishedAt,
-                LastUpdatedAt = mediaProgress.LastUpdatedAt
-
+                MediaTitle = mediaProgress.Media.Title
             };
 
             return response;
@@ -184,6 +141,32 @@ namespace WatchTrackerAPI.Services
                 exists.IsDeleted = true;
                 await _mediaProgressRepository.UpdateMediaProgress(exists); // save the new row state
             }
+        }
+
+        public async Task<List<MediaProgressResponse>> GetRomanticWatchList(Guid userId, WatchlistQueryParams watchlistParams)
+        {
+            var romanticList = await _mediaProgressRepository.GetRomanticWatchList(userId, watchlistParams);
+            var romanticWatchList = romanticList.Select(progress =>
+                                new MediaProgressResponse
+                                {
+                                    UserId = userId,
+                                    MediaId = progress.MediaId,
+                                    MediaTitle = progress.Media.Title
+                                });
+            return romanticWatchList.ToList();
+        }
+
+        public async Task<List<MediaProgressResponse>> GetRecentActivity(Guid userId, RecentActivityQueryParams recentActivityParams)
+        {
+            var recentActivity = await _mediaProgressRepository.GetRecentActivity(userId, recentActivityParams);
+            var activityList = recentActivity.Select(progress =>
+                           new MediaProgressResponse
+                           {
+                               UserId = userId,
+                               MediaId = progress.MediaId,
+                               MediaTitle = progress.Media.Title
+                           });
+            return activityList.ToList();
         }
 
         private async Task<UserMediaProgress?> GetMediaProgress(Guid userId, Guid mediaId)

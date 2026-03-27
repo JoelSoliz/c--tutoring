@@ -1,4 +1,5 @@
-﻿using WatchTrackerAPI.DTOs;
+﻿using WatchTrackerAPI.DTOs.Parameters;
+using WatchTrackerAPI.DTOs.Responses;
 using WatchTrackerAPI.Interfaces.Repositories;
 using WatchTrackerAPI.Interfaces.Services;
 
@@ -20,18 +21,22 @@ namespace WatchTrackerAPI.Services
                                 {
                                     UserId = userId,
                                     MediaId = progress.MediaId,
-                                    MediaTitle = progress.Media.Title,
-                                    MediaType = progress.Media.Type,
-                                    Genre = progress.Media.Genre.Name,
-                                    TotalEpisodes = progress.Media.TotalEpisodes,
-                                    EpisodesWatched = progress.EpisodesWatched,
-                                    WatchStatus = progress.Status,
-                                    PersonalRating = progress.PersonalRating,
-                                    StartedAt = progress.StartedAt,
-                                    FinishedAt = progress.FinishedAt,
-                                    LastUpdatedAt = progress.LastUpdatedAt
+                                    MediaTitle = progress.Media.Title
                                 });
             return top.ToList();
+        }
+
+        public async Task<List<MediaProgressResponse>> GetMonthlyRanking(Guid userId, TopRankingQueryParams topParams)
+        {
+            var monthlyRanking = await _userStatsRepository.MonthlyPersonalRanking(userId, topParams);
+            var ranking = monthlyRanking.Select(progress =>
+                                          new MediaProgressResponse
+                                          {
+                                              UserId = userId,
+                                              MediaId = progress.MediaId,
+                                              MediaTitle = progress.Media.Title
+                                          });
+            return ranking.ToList();
         }
     }
 }

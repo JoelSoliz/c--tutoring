@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WatchTrackerAPI.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
+using WatchTrackerAPI.DTOs.Parameters;
+using WatchTrackerAPI.DTOs.Requests;
 using WatchTrackerAPI.Interfaces.Services;
 
 namespace WatchTrackerAPI.Controllers
 {
     [ApiController]
     [Route("api/users/{userId}/media-progress")]
+    [Authorize(Roles = "User")]
     public class MediaProgressController : Controller
     {
         private readonly IMediaProgressService _mediaProgressService;
@@ -18,6 +22,7 @@ namespace WatchTrackerAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProgress(CreateProgressRequest request, [FromRoute] Guid userId)
         {
+            if (!isOwner(userId)) return Forbid();
             try
             {
                 var progress = await _mediaProgressService.CreateUserProgress(request, userId);
@@ -32,6 +37,7 @@ namespace WatchTrackerAPI.Controllers
         [HttpPatch("{mediaId}")]
         public async Task<IActionResult> UpdateUserMediaProgress(UpdateProgressRequest request, [FromRoute] Guid userId, [FromRoute] Guid mediaId)
         {
+            if (!isOwner(userId)) return Forbid();
             try
             {
                 var updatedProgress = await _mediaProgressService.UpdateUserProgress(request, userId, mediaId);
@@ -46,6 +52,7 @@ namespace WatchTrackerAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUserMediaProgress([FromRoute] Guid userId, [FromQuery] MediaProgressQueryParams mediaProgressParams)
         {
+            if (!isOwner(userId)) return Forbid();
             var userMediaProgress = await _mediaProgressService.GetAllUserProgress(userId, mediaProgressParams);
             return Ok(userMediaProgress);
         }
@@ -53,6 +60,7 @@ namespace WatchTrackerAPI.Controllers
         [HttpGet("{mediaId}")]
         public async Task<IActionResult> GetUserMediaProgress([FromRoute] Guid userId, [FromRoute] Guid mediaId)
         {
+            if (!isOwner(userId)) return Forbid();
             try
             {
                 var progress = await _mediaProgressService.GetUserProgress(userId, mediaId);
@@ -64,9 +72,26 @@ namespace WatchTrackerAPI.Controllers
             }
         }
 
+        [HttpGet("watchlist")]
+        public async Task<IActionResult> GetRomanticWatchList([FromRoute] Guid userId, [FromQuery] WatchlistQueryParams watchlistParams)
+        {
+            if (!isOwner(userId)) return Forbid();
+            var romanticList = await _mediaProgressService.GetRomanticWatchList(userId, watchlistParams);
+            return Ok(romanticList);
+        }
+
+        [HttpGet("recent-activity")]
+        public async Task<IActionResult> GetRecentActivity([FromRoute] Guid userId, [FromQuery] RecentActivityQueryParams recentActivityParams)
+        {
+            if (!isOwner(userId)) return Forbid();
+            var activity = await _mediaProgressService.GetRecentActivity(userId, recentActivityParams);
+            return Ok(activity);
+        }
+
         [HttpDelete("{mediaId}")]
         public async Task<IActionResult> DeleteUserProgress([FromRoute] Guid userId, [FromRoute] Guid mediaId)
         {
+            if (!isOwner(userId)) return Forbid();
             try
             {
                 await _mediaProgressService.DeleteUserProgress(userId, mediaId);
@@ -76,6 +101,17 @@ namespace WatchTrackerAPI.Controllers
             {
                 return NotFound(exception.Message);
             }
+        }
+
+        private bool isOwner(Guid userId)
+        {
+            var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value; //get the value of sub claim
+            if (sub == null) return false;
+            if (Guid.Parse(sub) != userId)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

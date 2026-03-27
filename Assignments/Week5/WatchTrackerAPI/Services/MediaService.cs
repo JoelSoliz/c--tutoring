@@ -1,4 +1,6 @@
-﻿using WatchTrackerAPI.DTOs;
+﻿using WatchTrackerAPI.DTOs.Parameters;
+using WatchTrackerAPI.DTOs.Requests;
+using WatchTrackerAPI.DTOs.Responses;
 using WatchTrackerAPI.Interfaces.Repositories;
 using WatchTrackerAPI.Interfaces.Services;
 using WatchTrackerAPI.Models.Entities;

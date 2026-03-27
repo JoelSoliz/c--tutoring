@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WatchTrackerAPI.Data;
-using WatchTrackerAPI.DTOs;
+using WatchTrackerAPI.DTOs.Parameters;
 using WatchTrackerAPI.Interfaces.Repositories;
 using WatchTrackerAPI.Models.Entities;
 using WatchTrackerAPI.Models.Enums;
@@ -32,9 +32,20 @@ namespace WatchTrackerAPI.Repositories
             return topAnimes;
         }
 
-        public Task<List<UserMediaProgress>> MonthlyPersonalRanking(Guid userId, TopRankingQueryParams topParams)
+        public async Task<List<UserMediaProgress>> MonthlyPersonalRanking(Guid userId, TopRankingQueryParams topParams)
         {
-            throw new NotImplementedException();
+            var monthlyRanking = await _dbContext.MediaProgresses
+                .Include(progress => progress.Media)
+                .Where(progress => progress.StartedAt != null &&
+                                   progress.StartedAt.Value.Month == DateTime.UtcNow.Month &&
+                                   progress.StartedAt.Value.Year == DateTime.UtcNow.Year &&
+                                   progress.IsDeleted == false &&
+                                   progress.PersonalRating != null)
+                .OrderByDescending(progress => progress.PersonalRating)
+                .Take(topParams.Limit)
+                .ToListAsync();
+
+            return monthlyRanking;
         }
     }
 }
