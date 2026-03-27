@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WatchTrackerAPI.Models.Enums;
 
-namespace WatchTrackerAPI.DTOs
+namespace WatchTrackerAPI.DTOs.Requests
 {
     public class CreateMediaRequest
     {
@@ -11,7 +11,7 @@ namespace WatchTrackerAPI.DTOs
         public MediaTypes Type { get; set; }
         [Required]
         public int? TotalEpisodes { get; set; }
-        public DateTime ReleaseDate { get; set; }
+        public DateOnly ReleaseDate { get; set; }
         public string Genre { get; set; }
     }
 }

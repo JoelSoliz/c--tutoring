@@ -1,4 +1,4 @@
-﻿namespace WatchTrackerAPI.DTOs
+﻿namespace WatchTrackerAPI.DTOs.Responses
 {
     public class GenreResponse
     {
