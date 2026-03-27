@@ -1,4 +1,6 @@
-﻿using WatchTrackerAPI.DTOs;
+﻿using WatchTrackerAPI.DTOs.Parameters;
+using WatchTrackerAPI.DTOs.Requests;
+using WatchTrackerAPI.DTOs.Responses;
 
 namespace WatchTrackerAPI.Interfaces.Services
 {
