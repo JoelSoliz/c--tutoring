@@ -66,5 +66,19 @@ namespace WatchTrackerAPI.Controllers
                 return BadRequest(exception.Message);
             }
         }
+
+        [HttpPost("{mediaId}/image")]
+        public async Task<IActionResult> UploadImageToMedia(Guid mediaId, IFormFile file)
+        {
+            try
+            {
+                var uploadedImage = await _mediaService.UploadImage(mediaId, file);
+                return Ok(uploadedImage);
+            }
+            catch (InvalidOperationException exception)
+            {
+                return NotFound(exception.Message);
+            }
+        }
     }
 }

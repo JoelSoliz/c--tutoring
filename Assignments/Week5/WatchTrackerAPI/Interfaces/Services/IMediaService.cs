@@ -10,5 +10,6 @@ namespace WatchTrackerAPI.Interfaces.Services
         public Task<MediaResponse> GetMedia(Guid id);
         public Task<MediaResponse> CreateMedia(CreateMediaRequest request);
         public Task DeleteMedia(Guid id);
+        public Task<MediaResponse> UploadImage(Guid mediaId, IFormFile formFile);
     }
 }

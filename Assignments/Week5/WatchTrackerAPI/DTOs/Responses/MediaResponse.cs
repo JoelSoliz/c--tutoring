@@ -10,6 +10,7 @@ namespace WatchTrackerAPI.DTOs.Responses
         public int? TotalEpisodes { get; set; }
         public DateOnly ReleaseDate { get; set; }
         public GenreResponse Genre { get; set; }
+        public string Image { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

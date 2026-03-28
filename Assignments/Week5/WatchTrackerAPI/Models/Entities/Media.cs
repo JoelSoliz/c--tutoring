@@ -10,6 +10,7 @@ namespace WatchTrackerAPI.Models.Entities
         public int? TotalEpisodes { get; set; }
         public DateOnly ReleaseDate { get; set; }
         public Guid GenreId { get; set; }
+        public string Image { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<UserMediaProgress> UserProgress { get; set; }
 
