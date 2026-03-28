@@ -85,8 +85,47 @@
         */
         #endregion
 
-        #region Finding Privacy
+        string degree = Console.ReadLine();
+        int N = int.Parse(degree);
+        string[] polinomial = Console.ReadLine().Split(' ');
+        int[] coeficients = new int[N + 1];
+        int steps = 0;
 
+        for (int i = 0; i < N + 1; i++)
+        {
+            coeficients[i] = int.Parse(polinomial[i]);
+        }
+
+        while (!(coeficients.Length == 1 && coeficients[0] == 1)) //P(x) = 1, or if the size is 1
+        {
+            if (coeficients[coeficients.Length - 1] == 1) //if it's constant term
+            {
+                int[] newCoefs = new int[coeficients.Length + 1];
+                for (int i = 0; i < coeficients.Length; i++)
+                {
+                    newCoefs[i] = (newCoefs[i] + coeficients[i]) % 2; //normal P
+                    newCoefs[i + 1] = (newCoefs[i + 1] + coeficients[i]) % 2; // p * x
+                }
+                newCoefs[newCoefs.Length - 1] = (newCoefs[newCoefs.Length - 1] + 1) % 2; //adds 1,if 2 = 0
+                coeficients = newCoefs;
+            }
+            else //divide by x
+            {
+                int[] newCoefs = new int[coeficients.Length - 1]; //[0,1,0,1,1] => [1,0,1,1]
+                for (int i = 0; i < newCoefs.Length; i++)
+                {
+                    newCoefs[i] = coeficients[i];
+                }
+                coeficients = newCoefs;
+            }
+            steps++;
+        }
+        Console.WriteLine(steps);
+
+
+
+        #region Finding Privacy
+        /*
         string[] data = Console.ReadLine().Split(' ');
         int K = int.Parse(data[0]);
         int N = int.Parse(data[1]);
@@ -117,7 +156,7 @@
             }
         }
         Console.WriteLine();
-
+        */
         #endregion
 
         #region Kool Strings
@@ -159,5 +198,7 @@
         Console.WriteLine(operations + " " + new string(characters));
         */
         #endregion
+
+
     }
 }
