@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using MultiverseBistroAPI.Data;
 using MultiverseBistroAPI.Interfaces.Repositories;
 using MultiverseBistroAPI.Interfaces.Services;
+using MultiverseBistroAPI.Middlewares;
 using MultiverseBistroAPI.Repositories;
 using MultiverseBistroAPI.Services;
 using System.Text;
@@ -81,8 +82,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
