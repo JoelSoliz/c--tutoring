@@ -46,7 +46,6 @@
         #endregion
 
         #region Collatz Polynomial
-        /*
         string degree = Console.ReadLine();
         int N = int.Parse(degree);
         string[] polinomial = Console.ReadLine().Split(' ');
@@ -65,7 +64,7 @@
             {
                 polinom = polinom ^ (polinom << 1) ^ 1;
                 // p * x = p << 1
-                //  ^ polinom adds the original pxx + p = p(x+1)
+                //  ^ polinom adds the original px + p = p(x+1)
                 //coef = 0 or 1
                 // ^ 1 adds 1
                 // We can quit the 2 result if we sum 1 
@@ -85,6 +84,8 @@
         */
         #endregion
 
+        #region Collatz Polynomial 2
+        /*
         string degree = Console.ReadLine();
         int N = int.Parse(degree);
         string[] polinomial = Console.ReadLine().Split(' ');
@@ -121,8 +122,8 @@
             steps++;
         }
         Console.WriteLine(steps);
-
-
+        */
+        #endregion
 
         #region Finding Privacy
         /*
@@ -160,7 +161,7 @@
         #endregion
 
         #region Kool Strings
-        /*
+
         string[] data = Console.ReadLine().Split(" ");
         int K = int.Parse(data[0]);
         string S = data[1];
@@ -196,9 +197,7 @@
             }
         }
         Console.WriteLine(operations + " " + new string(characters));
-        */
+
         #endregion
-
-
     }
 }
