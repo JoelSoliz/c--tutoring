@@ -26,6 +26,7 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetMedia(Guid id)
         {
             try

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 using WatchTrackerAPI.DTOs.Parameters;
 using WatchTrackerAPI.DTOs.Requests;
 using WatchTrackerAPI.Interfaces.Services;
@@ -8,9 +7,9 @@ using WatchTrackerAPI.Interfaces.Services;
 namespace WatchTrackerAPI.Controllers
 {
     [ApiController]
-    [Route("api/users/{userId}/media-progress")]
+    [Route("api/users/media-progress")]
     [Authorize(Roles = "User")]
-    public class MediaProgressController : Controller
+    public class MediaProgressController : BaseController
     {
         private readonly IMediaProgressService _mediaProgressService;
 
@@ -20,12 +19,13 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProgress(CreateProgressRequest request, [FromRoute] Guid userId)
+        public async Task<IActionResult> CreateProgress(CreateProgressRequest request)
         {
-            if (!isOwner(userId)) return Forbid();
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
             try
             {
-                var progress = await _mediaProgressService.CreateUserProgress(request, userId);
+                var progress = await _mediaProgressService.CreateUserProgress(request, userId.Value);
                 return CreatedAtAction("GetUserMediaProgress", new { userId = progress.UserId, mediaId = progress.MediaId }, progress);
             }
             catch (InvalidOperationException exception)
@@ -35,12 +35,13 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpPatch("{mediaId}")]
-        public async Task<IActionResult> UpdateUserMediaProgress(UpdateProgressRequest request, [FromRoute] Guid userId, [FromRoute] Guid mediaId)
+        public async Task<IActionResult> UpdateUserMediaProgress(UpdateProgressRequest request, [FromRoute] Guid mediaId)
         {
-            if (!isOwner(userId)) return Forbid();
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
             try
             {
-                var updatedProgress = await _mediaProgressService.UpdateUserProgress(request, userId, mediaId);
+                var updatedProgress = await _mediaProgressService.UpdateUserProgress(request, userId.Value, mediaId);
                 return Ok(updatedProgress);
             }
             catch (InvalidOperationException exception)
@@ -50,20 +51,22 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUserMediaProgress([FromRoute] Guid userId, [FromQuery] MediaProgressQueryParams mediaProgressParams)
+        public async Task<IActionResult> GetAllUserMediaProgress([FromQuery] MediaProgressQueryParams mediaProgressParams)
         {
-            if (!isOwner(userId)) return Forbid();
-            var userMediaProgress = await _mediaProgressService.GetAllUserProgress(userId, mediaProgressParams);
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
+            var userMediaProgress = await _mediaProgressService.GetAllUserProgress(userId.Value, mediaProgressParams);
             return Ok(userMediaProgress);
         }
 
         [HttpGet("{mediaId}")]
-        public async Task<IActionResult> GetUserMediaProgress([FromRoute] Guid userId, [FromRoute] Guid mediaId)
+        public async Task<IActionResult> GetUserMediaProgress([FromRoute] Guid mediaId)
         {
-            if (!isOwner(userId)) return Forbid();
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
             try
             {
-                var progress = await _mediaProgressService.GetUserProgress(userId, mediaId);
+                var progress = await _mediaProgressService.GetUserProgress(userId.Value, mediaId);
                 return Ok(progress);
             }
             catch (InvalidOperationException exception)
@@ -73,45 +76,37 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpGet("watchlist")]
-        public async Task<IActionResult> GetRomanticWatchList([FromRoute] Guid userId, [FromQuery] WatchlistQueryParams watchlistParams)
+        public async Task<IActionResult> GetRomanticWatchList([FromQuery] WatchlistQueryParams watchlistParams)
         {
-            if (!isOwner(userId)) return Forbid();
-            var romanticList = await _mediaProgressService.GetRomanticWatchList(userId, watchlistParams);
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
+            var romanticList = await _mediaProgressService.GetRomanticWatchList(userId.Value, watchlistParams);
             return Ok(romanticList);
         }
 
         [HttpGet("recent-activity")]
-        public async Task<IActionResult> GetRecentActivity([FromRoute] Guid userId, [FromQuery] RecentActivityQueryParams recentActivityParams)
+        public async Task<IActionResult> GetRecentActivity([FromQuery] RecentActivityQueryParams recentActivityParams)
         {
-            if (!isOwner(userId)) return Forbid();
-            var activity = await _mediaProgressService.GetRecentActivity(userId, recentActivityParams);
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
+            var activity = await _mediaProgressService.GetRecentActivity(userId.Value, recentActivityParams);
             return Ok(activity);
         }
 
         [HttpDelete("{mediaId}")]
-        public async Task<IActionResult> DeleteUserProgress([FromRoute] Guid userId, [FromRoute] Guid mediaId)
+        public async Task<IActionResult> DeleteUserProgress([FromRoute] Guid mediaId)
         {
-            if (!isOwner(userId)) return Forbid();
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
             try
             {
-                await _mediaProgressService.DeleteUserProgress(userId, mediaId);
+                await _mediaProgressService.DeleteUserProgress(userId.Value, mediaId);
                 return NoContent();
             }
             catch (InvalidOperationException exception)
             {
                 return NotFound(exception.Message);
             }
-        }
-
-        private bool isOwner(Guid userId)
-        {
-            var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value; //get the value of sub claim
-            if (sub == null) return false;
-            if (Guid.Parse(sub) != userId)
-            {
-                return false;
-            }
-            return true;
         }
     }
 }
