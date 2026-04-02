@@ -13,7 +13,7 @@ namespace WatchTrackerAPI.Models.Entities
         [MaxLength(255)]
         public string Email { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(85)]
         public string PasswordHash { get; set; }
 
         public UserRoles Role { get; set; } = UserRoles.User;
