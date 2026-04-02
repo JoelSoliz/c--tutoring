@@ -87,6 +87,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDBContext>();
+    await db.Database.MigrateAsync(); //pending migrations if exists
+    await DbSeeder.SeedAsync(db);
+}
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
