@@ -205,54 +205,77 @@
         */
         #endregion
 
+        #region J
         int N = int.Parse(Console.ReadLine());
         long[] A = Console.ReadLine().Split(" ").Select(long.Parse).ToArray();
-        Dictionary<int, int> seen = new Dictionary<int, int>();
-        seen[0] = 0;
-        long sum = 0;
-        bool found = false;
 
-        for (int i = 1; i <= N; i++)
+        bool[] current = new bool[200];
+        bool[][] currentChoice = new bool[200][]; //if currentChoice[r][k] = true
+        for (int residue = 0; residue < 200; residue++) currentChoice[residue] = new bool[N];
+
+        for (int i = 0; i < N; i++)
         {
-            sum += A[i - 1];
-            int remainder = (int)(sum % 200);
-            if (seen.ContainsKey(remainder))
-            {
-                int j = seen[remainder];
-                if (j == 0 && i == 1) continue;
+            int ai = (int)(A[i] % 200); //calculate residue of actual element
+            bool[] next = new bool[200]; //copy of current
+            bool[][] nextChoice = new bool[200][];
+            for (int r = 0; r < 200; r++) nextChoice[r] = (bool[])currentChoice[r].Clone();
+            Array.Copy(current, next, 200);
 
-                Console.WriteLine("Yes");
-                if (j == 0)
-                {
-                    Console.WriteLine("1 1");
-                    Console.Write(i - 1);
-                    for (int k = 2; k <= i; k++)
-                        Console.Write(" " + k);
-                    Console.WriteLine();
-                }
-                else
-                {
-                    Console.Write(j);
-                    for (int k = 1; k <= j; k++)
-                        Console.Write(" " + k);
-                    Console.WriteLine();
-                    Console.Write(i);
-                    for (int k = 1; k <= i; k++)
-                        Console.Write(" " + k);
-                    Console.WriteLine();
-                }
-                found = true;
-                break;
-            }
-            else
+            int ri = ai;
+            bool[] solo = new bool[N]; //the sub of one element
+            solo[i] = true;
+
+            if (!next[ri]) //someone has ri? the residue
             {
-                seen[remainder] = i;
+                next[ri] = true;
+                nextChoice[ri] = solo; //first group achieveing residue
             }
+            else if (!nextChoice[ri].SequenceEqual(solo))
+            {
+                PrintAnswer(nextChoice[ri], solo, N);
+                return;
+            }
+
+            for (int residue = 0; residue < 200; residue++)
+            {
+                if (!current[residue]) continue; //If this residue wasn't reached before, skip it.
+                int nr = (residue + ai) % 200;
+                bool[] newChoice = (bool[])currentChoice[residue].Clone();
+                newChoice[i] = true;
+
+                if (!next[nr])
+                {
+                    next[nr] = true;
+                    nextChoice[nr] = newChoice;
+                }
+                else if (!nextChoice[nr].SequenceEqual(newChoice))
+                {
+                    PrintAnswer(nextChoice[nr], newChoice, N);
+                    return;
+                }
+            }
+
+            current = next;
+            currentChoice = nextChoice;
         }
 
-        if (!found)
-            Console.WriteLine("No");
+        Console.WriteLine("No");
     }
+
+    static void PrintAnswer(bool[] b1, bool[] b2, int N)
+    {
+        var indB = new List<int>();
+        var indC = new List<int>();
+        for (int k = 0; k < N; k++)
+        {
+            if (b1[k]) indB.Add(k + 1);
+            if (b2[k]) indC.Add(k + 1);
+        }
+        Console.WriteLine("Yes");
+        Console.WriteLine(indB.Count + " " + string.Join(" ", indB));
+        Console.WriteLine(indC.Count + " " + string.Join(" ", indC));
+    }
+    #endregion
 }
 
 
