@@ -239,18 +239,18 @@
             for (int residue = 0; residue < 200; residue++)
             {
                 if (!current[residue]) continue; //If this residue wasn't reached before, skip it.
-                int nr = (residue + ai) % 200;
+                int newResidue = (residue + ai) % 200;
                 bool[] newChoice = (bool[])currentChoice[residue].Clone();
                 newChoice[i] = true;
 
-                if (!next[nr])
+                if (!next[newResidue])
                 {
-                    next[nr] = true;
-                    nextChoice[nr] = newChoice;
+                    next[newResidue] = true;
+                    nextChoice[newResidue] = newChoice;
                 }
-                else if (!nextChoice[nr].SequenceEqual(newChoice))
+                else if (!nextChoice[newResidue].SequenceEqual(newChoice))
                 {
-                    PrintAnswer(nextChoice[nr], newChoice, N);
+                    PrintAnswer(nextChoice[newResidue], newChoice, N);
                     return;
                 }
             }
