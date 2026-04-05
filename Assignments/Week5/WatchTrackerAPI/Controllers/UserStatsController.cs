@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WatchTrackerAPI.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using WatchTrackerAPI.DTOs.Parameters;
 using WatchTrackerAPI.Interfaces.Services;
 
 namespace WatchTrackerAPI.Controllers
 {
     [ApiController]
-    [Route("api/users/{userId}")]
-    public class UserStatsController : Controller
+    [Route("api/users/stats")]
+    [Authorize(Roles = "User")]
+    public class UserStatsController : BaseController
     {
         private readonly IUserStatsService _userStatsService;
 
@@ -15,11 +17,23 @@ namespace WatchTrackerAPI.Controllers
             _userStatsService = userStatsService;
         }
 
-        [HttpGet("stats/top-anime")]
-        public async Task<IActionResult> GetTopCompletedAnimes([FromRoute] Guid userId, [FromQuery] TopRankingQueryParams animeParams)
+        [HttpGet("top-anime")]
+        public async Task<IActionResult> GetTopCompletedAnimes([FromQuery] TopRankingQueryParams animeParams)
         {
-            var topAnime = await _userStatsService.GetTopAnimes(userId, animeParams);
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
+            var topAnime = await _userStatsService.GetTopAnimes(userId.Value, animeParams);
             return Ok(topAnime);
         }
+
+        [HttpGet("monthly-top")]
+        public async Task<IActionResult> GetMonthlyRanking([FromQuery] TopRankingQueryParams rankingParams)
+        {
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
+            var ranking = await _userStatsService.GetMonthlyRanking(userId.Value, rankingParams);
+            return Ok(ranking);
+        }
     }
+
 }

@@ -6,5 +6,7 @@ namespace WatchTrackerAPI.Interfaces.Repositories
     {
         public Task CreateGenre(Genre genre);
         public Task<Genre?> GetGenreByName(string name);
+
+        public Task<(List<Genre> Items, int TotalCount)> GetAllGenres(int page, int pageSize);
     }
 }

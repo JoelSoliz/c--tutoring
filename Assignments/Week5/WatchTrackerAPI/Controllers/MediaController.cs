@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WatchTrackerAPI.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using WatchTrackerAPI.DTOs.Parameters;
+using WatchTrackerAPI.DTOs.Requests;
 using WatchTrackerAPI.Interfaces.Services;
 
 namespace WatchTrackerAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Moderator")]
     public class MediaController : Controller
     {
         private readonly IMediaService _mediaService;
@@ -15,6 +18,7 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllMedia([FromQuery] MediaQueryParams mediaParams)
         {
             var media = await _mediaService.GetAllMedia(mediaParams);
@@ -22,6 +26,7 @@ namespace WatchTrackerAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetMedia(Guid id)
         {
             try
@@ -60,6 +65,20 @@ namespace WatchTrackerAPI.Controllers
             catch (InvalidOperationException exception)
             {
                 return BadRequest(exception.Message);
+            }
+        }
+
+        [HttpPost("{mediaId}/image")]
+        public async Task<IActionResult> UploadImageToMedia(Guid mediaId, IFormFile file)
+        {
+            try
+            {
+                var uploadedImage = await _mediaService.UploadImage(mediaId, file);
+                return Ok(uploadedImage);
+            }
+            catch (InvalidOperationException exception)
+            {
+                return NotFound(exception.Message);
             }
         }
     }

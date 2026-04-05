@@ -37,5 +37,11 @@ namespace WatchTrackerAPI.Repositories
             var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Id == userId && user.IsDeleted == false);
             return user;
         }
+
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Email == email);
+            return user;
+        }
     }
 }

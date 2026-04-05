@@ -1,4 +1,6 @@
-﻿using WatchTrackerAPI.DTOs;
+﻿using WatchTrackerAPI.DTOs.Parameters;
+using WatchTrackerAPI.DTOs.Requests;
+using WatchTrackerAPI.DTOs.Responses;
 
 namespace WatchTrackerAPI.Interfaces.Services
 {
@@ -12,5 +14,9 @@ namespace WatchTrackerAPI.Interfaces.Services
         public Task<MediaProgressResponse> GetUserProgress(Guid userId, Guid mediaId);
 
         public Task DeleteUserProgress(Guid userId, Guid mediaId);
+
+        public Task<List<MediaProgressResponse>> GetRomanticWatchList(Guid userId, WatchlistQueryParams watchlistParams);
+
+        public Task<List<MediaProgressResponse>> GetRecentActivity(Guid userId, RecentActivityQueryParams recentActivityParams);
     }
 }

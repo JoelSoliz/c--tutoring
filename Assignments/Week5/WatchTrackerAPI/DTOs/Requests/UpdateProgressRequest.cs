@@ -1,6 +1,6 @@
 ﻿using WatchTrackerAPI.Models.Enums;
 
-namespace WatchTrackerAPI.DTOs
+namespace WatchTrackerAPI.DTOs.Requests
 {
     public class UpdateProgressRequest
     {

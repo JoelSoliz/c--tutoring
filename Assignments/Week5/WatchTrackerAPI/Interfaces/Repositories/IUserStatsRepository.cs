@@ -1,4 +1,4 @@
-﻿using WatchTrackerAPI.DTOs;
+﻿using WatchTrackerAPI.DTOs.Parameters;
 using WatchTrackerAPI.Models.Entities;
 
 namespace WatchTrackerAPI.Interfaces.Repositories

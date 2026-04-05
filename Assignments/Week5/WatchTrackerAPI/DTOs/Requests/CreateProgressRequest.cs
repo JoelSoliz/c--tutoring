@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WatchTrackerAPI.Models.Enums;
 
-namespace WatchTrackerAPI.DTOs
+namespace WatchTrackerAPI.DTOs.Requests
 {
     public class CreateProgressRequest
     {

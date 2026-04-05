@@ -35,6 +35,10 @@ namespace WatchTrackerAPI.Data
             modelBuilder.Entity<UserMediaProgress>()
                 .Property(mp => mp.Status)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.Role)
+                .HasConversion<string>();
         }
 
         public DbSet<Media> MediaContent { get; set; }

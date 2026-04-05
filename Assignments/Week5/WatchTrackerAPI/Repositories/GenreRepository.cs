@@ -25,5 +25,14 @@ namespace WatchTrackerAPI.Repositories
             var genre = await genres.Where(genre => genre.Name.ToLower() == name.ToLower()).FirstOrDefaultAsync();
             return genre;
         }
+
+        public async Task<(List<Genre> Items, int TotalCount)> GetAllGenres(int page, int pageSize)
+        {
+            IQueryable<Genre> genres = _dbContext.Genres;
+            var totalCount = await genres.CountAsync();
+            genres = genres.Skip((page - 1) * pageSize).Take(pageSize);
+            var genresList = await genres.AsNoTracking().ToListAsync();
+            return (genresList, totalCount);
+        }
     }
 }

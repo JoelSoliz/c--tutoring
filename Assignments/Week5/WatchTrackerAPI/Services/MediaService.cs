@@ -1,4 +1,6 @@
-﻿using WatchTrackerAPI.DTOs;
+﻿using WatchTrackerAPI.DTOs.Parameters;
+using WatchTrackerAPI.DTOs.Requests;
+using WatchTrackerAPI.DTOs.Responses;
 using WatchTrackerAPI.Interfaces.Repositories;
 using WatchTrackerAPI.Interfaces.Services;
 using WatchTrackerAPI.Models.Entities;
@@ -39,6 +41,7 @@ namespace WatchTrackerAPI.Services
                 TotalEpisodes = request.TotalEpisodes,
                 ReleaseDate = request.ReleaseDate,
                 GenreId = genre.Id,
+                Image = string.Empty,
                 CreatedAt = DateTime.UtcNow,
             };
 
@@ -52,6 +55,7 @@ namespace WatchTrackerAPI.Services
                 TotalEpisodes = newMedia.TotalEpisodes,
                 ReleaseDate = newMedia.ReleaseDate,
                 Genre = new GenreResponse { Id = genre.Id, Name = genre.Name },
+                Image = newMedia.Image,
                 CreatedAt = newMedia.CreatedAt
             };
         }
@@ -69,6 +73,7 @@ namespace WatchTrackerAPI.Services
                 TotalEpisodes = media.TotalEpisodes,
                 ReleaseDate = media.ReleaseDate,
                 Genre = new GenreResponse { Id = media.Genre.Id, Name = media.Genre.Name },
+                Image = media.Image,
                 CreatedAt = media.CreatedAt,
             }).ToList();
 
@@ -95,6 +100,7 @@ namespace WatchTrackerAPI.Services
                 TotalEpisodes = media.TotalEpisodes,
                 ReleaseDate = media.ReleaseDate,
                 Genre = new GenreResponse { Id = media.Genre.Id, Name = media.Genre.Name },
+                Image = media.Image,
                 CreatedAt = media.CreatedAt,
             };
             return response;
@@ -115,6 +121,36 @@ namespace WatchTrackerAPI.Services
                 throw new InvalidOperationException($"The Media with {mediaId} was not found");
             }
             return media;
+        }
+
+        public async Task<MediaResponse> UploadImage(Guid mediaId, IFormFile formFile)
+        {
+            var media = await FindValidMedia(mediaId);
+            if (formFile == null || formFile.Length == 0)
+            {
+                throw new InvalidOperationException("Invalid file uploaded");
+            }
+
+            var filename = $"{Guid.NewGuid()}{Path.GetExtension(formFile.FileName)}";
+            var path = Path.Combine("uploads", filename);
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                formFile.CopyTo(stream);
+            }
+            media.Image = $"/uploads/{filename}";
+            await _mediaRepository.UpdateMedia(media);
+
+            return new MediaResponse
+            {
+                Id = media.Id,
+                Title = media.Title,
+                Type = media.Type,
+                TotalEpisodes = media.TotalEpisodes,
+                ReleaseDate = media.ReleaseDate,
+                Genre = new GenreResponse { Id = media.Genre.Id, Name = media.Genre.Name },
+                Image = media.Image,
+                CreatedAt = media.CreatedAt,
+            };
         }
     }
 }

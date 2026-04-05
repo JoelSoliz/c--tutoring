@@ -85,12 +85,53 @@
         */
         #endregion
 
+        string degree = Console.ReadLine();
+        int N = int.Parse(degree);
+        string[] polinomial = Console.ReadLine().Split(' ');
+        int[] coeficients = new int[N + 1];
+        int steps = 0;
+
+        for (int i = 0; i < N + 1; i++)
+        {
+            coeficients[i] = int.Parse(polinomial[i]);
+        }
+
+        while (!(coeficients.Length == 1 && coeficients[0] == 1)) //P(x) = 1, or if the size is 1
+        {
+            if (coeficients[coeficients.Length - 1] == 1) //if it's constant term
+            {
+                int[] newCoefs = new int[coeficients.Length + 1];
+                for (int i = 0; i < coeficients.Length; i++)
+                {
+                    newCoefs[i] = (newCoefs[i] + coeficients[i]) % 2; //normal P
+                    newCoefs[i + 1] = (newCoefs[i + 1] + coeficients[i]) % 2; // p * x
+                }
+                newCoefs[newCoefs.Length - 1] = (newCoefs[newCoefs.Length - 1] + 1) % 2; //adds 1,if 2 = 0
+                coeficients = newCoefs;
+            }
+            else //divide by x
+            {
+                int[] newCoefs = new int[coeficients.Length - 1]; //[0,1,0,1,1] => [1,0,1,1]
+                for (int i = 0; i < newCoefs.Length; i++)
+                {
+                    newCoefs[i] = coeficients[i];
+                }
+                coeficients = newCoefs;
+            }
+            steps++;
+        }
+        Console.WriteLine(steps);
+
+
+
         #region Finding Privacy
+        /*
         string[] data = Console.ReadLine().Split(' ');
         int K = int.Parse(data[0]);
         int N = int.Parse(data[1]);
 
-        bool[] toilets = new bool[N];
+        int y = N - 2 * K; //B: X-
+        int x = 3 * K - N; //A: X--
 
         if (K < (N - 1) / 2 || K > (N + 1) / 2)
         {
@@ -98,31 +139,66 @@
             return;
         }
 
-        int count = 0;
-        int start = (K == (N + 1) / 2) ? 0 : 1;
+        if (K == (N - 1) / 2) Console.Write("-"); //if it's minimum
 
-        for (int i = start; i < toilets.Length; i += 2)
+        for (int i = 0; i < K; i++)
         {
-            toilets[i] = true;
-            count++;
-            if (count == K)
+            bool isLastIteration = (i == K - 1);
+            if (y > 0)
             {
-                break;
-            }
-        }
-
-        for (int i = 0; i < toilets.Length; i++)
-        {
-            if (toilets[i] == true)
-            {
-                Console.Write("X");
+                Console.Write(isLastIteration ? "X-" : "X--");
+                y--;
             }
             else
             {
-                Console.Write("-");
+                Console.Write(isLastIteration ? "X" : "X-");
+                x--;
             }
         }
         Console.WriteLine();
+        */
         #endregion
+
+        #region Kool Strings
+        /*
+        string[] data = Console.ReadLine().Split(" ");
+        int K = int.Parse(data[0]);
+        string S = data[1];
+        char[] characters = S.ToCharArray(); //here we're going to do the flips
+
+        int operations = 0;
+        int count = 1;
+
+        for (int i = 1; i < S.Length; i++)
+        {
+            if (characters[i] == characters[i - 1])
+            {
+                count++;
+            }
+            else // if they're different
+            {
+                count = 1;
+            }
+
+            if (count == K)
+            {
+                if (characters[i] == '1')
+                {
+                    characters[i] = '0';
+                }
+                else
+                {
+                    characters[i] = '1';
+                }
+
+                operations++;
+                count = 1;
+            }
+        }
+        Console.WriteLine(operations + " " + new string(characters));
+        */
+        #endregion
+
+
     }
 }

@@ -1,6 +1,6 @@
 ﻿using WatchTrackerAPI.Models.Enums;
 
-namespace WatchTrackerAPI.DTOs
+namespace WatchTrackerAPI.DTOs.Responses
 {
     public class MediaResponse
     {
@@ -8,8 +8,9 @@ namespace WatchTrackerAPI.DTOs
         public string Title { get; set; }
         public MediaTypes Type { get; set; }
         public int? TotalEpisodes { get; set; }
-        public DateTime ReleaseDate { get; set; }
+        public DateOnly ReleaseDate { get; set; }
         public GenreResponse Genre { get; set; }
+        public string Image { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

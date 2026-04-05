@@ -1,11 +1,9 @@
-﻿using WatchTrackerAPI.DTOs;
+﻿using WatchTrackerAPI.DTOs.Responses;
 
 namespace WatchTrackerAPI.Interfaces.Services
 {
     public interface IUserService
     {
-        public Task<UserResponse> CreateUser(CreateUserRequest user);
-
         public Task<List<UserResponse>> GetAllUsers();
         public Task<UserResponse> GetUser(Guid userId);
 

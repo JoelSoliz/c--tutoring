@@ -1,16 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WatchTrackerAPI.DTOs
+namespace WatchTrackerAPI.DTOs.Requests
 {
-    public class CreateUserRequest
+    public class RegisterUserRequest
     {
         [Required]
         [MinLength(2)]
-        [MaxLength(40)]
+        [MaxLength(50)]
         public string Name { get; set; }
 
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
+        [Required]
+        [MinLength(8)]
+        public string Password { get; set; }
     }
 }
