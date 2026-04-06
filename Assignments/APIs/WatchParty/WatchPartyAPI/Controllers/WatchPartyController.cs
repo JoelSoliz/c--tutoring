@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WatchPartyAPI.DTOs.Requests;
 using WatchPartyAPI.Interfaces.Services;
@@ -18,8 +20,16 @@ namespace WatchPartyAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateParty(CreatePartyRequest request)
+        public async Task<IActionResult> CreateParty(CreatePartyRequest request, IValidator<CreatePartyRequest> validator)
         {
+            var result = await validator.ValidateAsync(request, options => { options.IncludeRuleSets("Async"); });
+
+            if (!result.IsValid)
+            {
+                result.AddToModelState(ModelState, null);
+                return BadRequest(ModelState);
+            }
+
             var userId = GetUserIdFromToken();
             var party = await _watchPartyService.CreateParty(request, userId);
             return CreatedAtAction(nameof(GetParty), new { id = party.Id }, party);

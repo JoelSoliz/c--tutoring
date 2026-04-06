@@ -75,7 +75,7 @@
         */
         #endregion
 
-        #region F
+        #region A
         /*
         int N = int.Parse(Console.ReadLine());
         int[] data = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();

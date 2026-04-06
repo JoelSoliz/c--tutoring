@@ -25,5 +25,14 @@ namespace WatchPartyAPI.Repositories
             var episode = await _dbContext.Episodes.FirstOrDefaultAsync(e => e.Id == id);
             return episode;
         }
+
+        public async Task<IEnumerable<Episode>> GetAllEpisodes(int limit, int page)
+        {
+            return await _dbContext.Episodes
+                .AsNoTracking()
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToListAsync();
+        }
     }
 }

@@ -48,5 +48,25 @@ namespace WatchPartyAPI.Services
                 DurationSeconds = episode.DurationSeconds,
             };
         }
+
+        public async Task<EpisodePaginatedResponse> GetEpisodes(int limit, int page)
+        {
+            var episodes = await _episodeRepository.GetAllEpisodes(limit, page);
+            var response = episodes
+                .Select(episode => new EpisodeResponse
+                {
+                    Id = episode.Id,
+                    AnimeTitle = episode.AnimeTitle,
+                    EpisodeNumber = episode.EpisodeNumber,
+                    DurationSeconds = episode.DurationSeconds
+                });
+            return new EpisodePaginatedResponse
+            {
+                Data = response,
+                Limit = limit,
+                Page = page,
+                TotalCount = episodes.Count()
+            };
+        }
     }
 }

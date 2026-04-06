@@ -8,5 +8,6 @@ namespace WatchPartyAPI.Interfaces.Services
         public Task<EpisodeResponse> CreateEpisode(CreateEpisodeRequest request);
 
         public Task<EpisodeResponse> GetEpisode(Guid episodeId);
+        public Task<EpisodePaginatedResponse> GetEpisodes(int limit, int page);
     }
 }

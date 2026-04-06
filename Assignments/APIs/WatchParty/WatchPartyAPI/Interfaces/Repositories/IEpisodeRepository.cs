@@ -6,5 +6,6 @@ namespace WatchPartyAPI.Interfaces.Repositories
     {
         public Task<Episode?> GetById(Guid id);
         public Task<Episode> Create(Episode episode);
+        public Task<IEnumerable<Episode>> GetAllEpisodes(int limit, int page);
     }
 }

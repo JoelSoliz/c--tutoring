@@ -29,5 +29,12 @@ namespace WatchPartyAPI.Controllers
             var episode = await _episodeService.GetEpisode(id);
             return Ok(episode);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllEpisodes(int limit = 5, int page = 1)
+        {
+            var episodes = await _episodeService.GetEpisodes(limit, page);
+            return Ok(episodes);
+        }
     }
 }

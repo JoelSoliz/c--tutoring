@@ -15,6 +15,7 @@ namespace WatchPartyAPI.Services
         private readonly IParticipantService _participantService;
         private readonly ILogger<WatchPartyService> _logger;
 
+
         public WatchPartyService(IWatchPartyRepository watchPartyRepository, IEpisodeService episodeService, IParticipantService participantService, ILogger<WatchPartyService> logger)
         {
             _watchPartyRepository = watchPartyRepository;
@@ -41,8 +42,6 @@ namespace WatchPartyAPI.Services
 
         public async Task<WatchPartyResponse> CreateParty(CreatePartyRequest request, Guid hostUserId)
         {
-            await _episodeService.GetEpisode(request.CurrentEpisodeId);
-
             var wp = new WatchParty
             {
                 Id = Guid.NewGuid(),
