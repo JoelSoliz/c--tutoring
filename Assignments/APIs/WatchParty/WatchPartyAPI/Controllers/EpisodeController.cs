@@ -7,6 +7,7 @@ namespace WatchPartyAPI.Controllers
 {
     [ApiController]
     [Route("api/episodes")]
+    [Authorize]
     public class EpisodeController : Controller
     {
         private readonly IEpisodeService _episodeService;

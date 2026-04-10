@@ -28,6 +28,15 @@ namespace WatchPartyAPI.Repositories
 
         }
 
+        public async Task<IEnumerable<WatchParty>> GetAllParties(int limit, int page)
+        {
+            return await _dbContext.WatchParties
+                .AsNoTracking()
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToListAsync();
+        }
+
         public async Task Update(WatchParty watchParty)
         {
             await _dbContext.SaveChangesAsync();

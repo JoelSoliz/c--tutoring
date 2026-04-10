@@ -11,5 +11,6 @@ namespace WatchPartyAPI.Interfaces.Services
         public Task ChangeEpisode(Guid watchPartyId, Guid userId, ChangeEpisodeRequest request);
         public Task EndParty(Guid watchPartyId, Guid userId);
         public Task<WatchPartyResponse> GetParty(Guid watchPartyId);
+        public Task<WatchPartyPaginatedResponse> GetAllParties(int limit, int page);
     }
 }

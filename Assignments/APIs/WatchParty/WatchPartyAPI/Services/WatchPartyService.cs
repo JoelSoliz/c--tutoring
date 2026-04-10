@@ -94,6 +94,26 @@ namespace WatchPartyAPI.Services
             };
         }
 
+        public async Task<WatchPartyPaginatedResponse> GetAllParties(int limit, int page)
+        {
+            var parties = await _watchPartyRepository.GetAllParties(limit, page);
+            var response = parties
+            .Select(wp => new WatchPartyResponse
+            {
+                Id = wp.Id,
+                Title = wp.Title,
+                HostUserId = wp.HostUserId,
+                CurrentEpisodeId = wp.CurrentEpisodeId,
+                Status = wp.Status,
+            });
+            return new WatchPartyPaginatedResponse
+            {
+                Data = response,
+                Limit = limit,
+                Page = page,
+                TotalCount = parties.Count()
+            };
+        }
         public async Task JoinParty(Guid watchPartyId, Guid userId)
         {
             await _participantService.CreateParticipant(userId, watchPartyId, ParticipantRole.Viewer);

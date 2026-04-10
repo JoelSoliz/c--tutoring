@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WatchPartyAPI.Interfaces.Services;
 
 namespace WatchPartyAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : Controller
+    [Authorize]
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
         public UserController(IUserService userService)
@@ -16,15 +18,8 @@ namespace WatchPartyAPI.Controllers
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUser(Guid userId)
         {
-            try
-            {
-                var media = await _userService.GetUser(userId);
-                return Ok(media);
-            }
-            catch (InvalidOperationException exception)
-            {
-                return NotFound(exception.Message);
-            }
+            var user = await _userService.GetUser(userId);
+            return Ok(user);
         }
 
         [HttpGet]

@@ -2,6 +2,7 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WatchPartyAPI.DTOs.Params;
 using WatchPartyAPI.DTOs.Requests;
 using WatchPartyAPI.Interfaces.Services;
 
@@ -22,12 +23,26 @@ namespace WatchPartyAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateParty(CreatePartyRequest request, IValidator<CreatePartyRequest> validator)
         {
-            var result = await validator.ValidateAsync(request, options => { options.IncludeRuleSets("Async"); });
-
-            if (!result.IsValid)
+            var syncResult = await validator.ValidateAsync(request, options =>
             {
-                result.AddToModelState(ModelState, null);
-                return BadRequest(ModelState);
+                options.IncludeRuleSets("default");
+            });
+
+            if (!syncResult.IsValid)
+            {
+                syncResult.AddToModelState(ModelState, null);
+                return ValidationProblem(ModelState);
+            }
+
+            var asyncResult = await validator.ValidateAsync(request, options =>
+            {
+                options.IncludeRuleSets("Async");
+            });
+
+            if (!asyncResult.IsValid)
+            {
+                asyncResult.AddToModelState(ModelState, null);
+                return ValidationProblem(ModelState);
             }
 
             var userId = GetUserIdFromToken();
@@ -40,6 +55,13 @@ namespace WatchPartyAPI.Controllers
         {
             var party = await _watchPartyService.GetParty(id);
             return Ok(party);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllParties([FromQuery] PaginationParams wpParams)
+        {
+            var parties = await _watchPartyService.GetAllParties(wpParams.Limit, wpParams.Page);
+            return Ok(parties);
         }
 
         [HttpPost("{id}/participants")]
@@ -59,8 +81,26 @@ namespace WatchPartyAPI.Controllers
         }
 
         [HttpPatch("{id}/episode")]
-        public async Task<IActionResult> ChangeEpisode(Guid id, ChangeEpisodeRequest request)
+        public async Task<IActionResult> ChangeEpisode(Guid id, ChangeEpisodeRequest request, IValidator<ChangeEpisodeRequest> validator)
         {
+            var syncResult = await validator.ValidateAsync(request, options =>
+                options.IncludeRuleSets("default"));
+
+            if (!syncResult.IsValid)
+            {
+                syncResult.AddToModelState(ModelState, null);
+                return ValidationProblem(ModelState);
+            }
+
+            var asyncResult = await validator.ValidateAsync(request, options =>
+                options.IncludeRuleSets("Async"));
+
+            if (!asyncResult.IsValid)
+            {
+                asyncResult.AddToModelState(ModelState, null);
+                return ValidationProblem(ModelState);
+            }
+
             var userId = GetUserIdFromToken();
             await _watchPartyService.ChangeEpisode(id, userId, request);
             return Ok();
