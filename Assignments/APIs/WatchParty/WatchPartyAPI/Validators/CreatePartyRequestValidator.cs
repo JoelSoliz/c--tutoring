@@ -25,10 +25,9 @@ namespace WatchPartyAPI.Validators
                     .MustAsync(async (episodeId, ct) =>
                     {
                         return await episodeRepository.GetById(episodeId) != null;
-                    }).WithMessage("The episode doesn't exists");
-
+                    }).WithMessage("The episode doesn't exists")
+                    .When(wp => wp.CurrentEpisodeId != Guid.Empty);
             });
-
         }
     }
 }
