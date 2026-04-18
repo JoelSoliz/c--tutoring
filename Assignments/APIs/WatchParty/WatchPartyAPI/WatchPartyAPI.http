@@ -1,0 +1,6 @@
+@WatchPartyAPI_HostAddress = http://localhost:5162
+
+GET {{WatchPartyAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
